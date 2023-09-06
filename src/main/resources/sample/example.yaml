@@ -1,0 +1,9 @@
+entities:
+  Product:
+    name: String
+    description: String
+    colors:
+      - blue
+      - red
+      - yellow
+
