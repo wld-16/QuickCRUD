@@ -1,9 +1,51 @@
+packagePath: wld.accelerate.pipelinec
+enums:
+  Probability: "[TEN_PERCENT, THIRTY_PERCENT, FIFTY_PERCENT, HUNDRED_PERCENT]"
+  Status: "[WON, LOST, OPEN]"
+controllers:
+  Product:
+    CREATE: true
+    READ: true
+    READ_ALL: true
+    UPDATE: true
+    DELETE: true
+
 entities:
+  Ship:
+    name: String
+    loadCapacity: Integer
+
+  Container:
+    name: String
+    loadCapacity: Integer
+
+  Port:
+    name: String
+    numberOfContainerCranes: Integer
+
+  ContainerCrane:
+    name: String
+    hoistPower: Integer
+
   Product:
     name: String
     description: String
-    colors:
-      - blue
-      - red
-      - yellow
 
+  Article:
+    name: String
+    number: String
+
+  Opportunity:
+    name: String
+    probability: Probability
+    status: Status
+
+  Activity:
+    name: String
+
+  Contact:
+    forename: String
+    lastname: String
+    email: String
+    tel: String
+    description: String

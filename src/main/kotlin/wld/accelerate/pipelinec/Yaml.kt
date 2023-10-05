@@ -9,7 +9,7 @@ fun parseYaml(fileUrl: String): Map<String, Any>? {
     val inputStream: InputStream = FileInputStream(File(fileUrl))
 
     val yaml = Yaml()
-    val data = yaml.load<Map<String, kotlin.Any>>(inputStream)
+    val data = yaml.load<Map<String, Any>>(inputStream)
     println(data)
     return data
 }
