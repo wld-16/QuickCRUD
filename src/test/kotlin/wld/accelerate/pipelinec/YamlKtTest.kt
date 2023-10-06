@@ -163,7 +163,6 @@ class YamlKtTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-
         val entityClassRepresentations = writeEntityDataClass(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
 
         entityClassRepresentations.forEach{
@@ -241,7 +240,7 @@ class YamlKtTest() {
     }
 
     @Test
-    fun test_writeVueComponent() {
+    fun test_writeVueDetailsComponent() {
         val resourceName = "sample/example.yaml"
 
         val classLoader = javaClass.classLoader
@@ -249,11 +248,55 @@ class YamlKtTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val entityClassRepresentations = writeVueTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
+        val entityClassRepresentations = writeVueDetailsComponentTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
         entityClassRepresentations.forEach {
-            File("src/test/kotlin/wld/accelerate/pipelinec/vuetify/" + it.key +".vue").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/" + it.key + "Details" +".vue").writeText(it.value)
         }
+    }
+
+    @Test
+    fun test_writeVueListComponent() {
+        val resourceName = "sample/example.yaml"
+
+        val classLoader = javaClass.classLoader
+        val file = File(classLoader.getResource(resourceName)!!.file)
+
+        val yamlMap = parseYaml(file.absolutePath)
+
+        val entityClassRepresentations = writeVueListComponentTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
+
+        entityClassRepresentations.forEach {
+            File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/" + it.key + "List" +".vue").writeText(it.value)
+        }
+    }
+
+    @Test
+    fun test_writeVueLandingPage() {
+        val resourceName = "sample/example.yaml"
+
+        val classLoader = javaClass.classLoader
+        val file = File(classLoader.getResource(resourceName)!!.file)
+
+        val yamlMap = parseYaml(file.absolutePath)
+
+        val landingPage = writeVueLandingPageComponentTemplate((yamlMap?.get("entities") as Map<String, *>).keys.toList())
+
+        File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/LandingPage.vue").writeText(landingPage)
+    }
+
+    @Test
+    fun test_writeVueRouter() {
+        val resourceName = "sample/example.yaml"
+
+        val classLoader = javaClass.classLoader
+        val file = File(classLoader.getResource(resourceName)!!.file)
+
+        val yamlMap = parseYaml(file.absolutePath)
+
+        val routerPlugin = writeVueRouterJs(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
+
+        File("src/test/kotlin/wld/accelerate/pipelinec/vue/plugins/router.js").writeText(routerPlugin)
     }
 
     companion object {
@@ -271,7 +314,9 @@ class YamlKtTest() {
             Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/model/"))
             Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/repository/"))
             Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/sql/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vuetify/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/components/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/plugins/"))
         }
     }
 }

@@ -12,6 +12,8 @@ repositories {
 }
 dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+  testCompileOnly("org.springframework.boot:spring-boot-starter-web:3.1.3")
+  testCompileOnly("org.springframework.boot:spring-boot-starter-data-jpa:3.1.3")
 }
 
 // Configure Gradle IntelliJ Plugin

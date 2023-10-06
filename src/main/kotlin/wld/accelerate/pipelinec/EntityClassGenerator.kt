@@ -3,35 +3,6 @@ package wld.accelerate.pipelinec
 import wld.accelerate.pipelinec.extension.capitalize
 import wld.accelerate.pipelinec.extension.unCapitalize
 
-fun writeVueTemplate(entities: Map<String, Map<String, Any>>): Map<String, String> {
-    val scriptsTagHead: (String) -> String =
-        { "<script setup>\nimport { reactive } from 'vue'\nconst $it = reactive({\n" }
-    val scriptsTagFields: (String) -> String = {
-        "  $it: undefined"
-    }
-    val scriptsTagFoot = "\n\t})\n</script>"
-
-    val scriptTags = entities.entries.associate {
-        val fields = it.value.keys.joinToString(separator = ",\n") { field -> scriptsTagFields(field) }
-        it.key to (scriptsTagHead(it.key) + fields + scriptsTagFoot + "\n" + "\n")
-    }
-
-    val templateTags = entities.keys.associateWith {
-        "<template>\n" +
-                "  <v-table>\n" +
-                "    <tbody>\n" +
-                "    <tr v-for=\"(value, key) in ${it}\" class=\"text-left\">\n" +
-                "      <td>{{ key }}</td>\n" +
-                "      <td>{{ value }}</td>\n" +
-                "    </tr>\n" +
-                "    </tbody>\n" +
-                "  </v-table>\n" +
-                "</template>"
-    }
-
-    return entities.keys.associateWith { scriptTags[it] + templateTags[it] }
-}
-
 fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
     val sqlTableHead: (String) -> String = { "CREATE TABLE $it (\n" }
     val sqlTableFieldTemplate: (String, String) -> String = { fieldName, fieldType ->
@@ -334,8 +305,8 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
 
     val autowiredComponents: (String) -> String = {
         "\t@Autowired\n" +
-                "\tpublic ${String.capitalize(it)}Repository ${it.lowercase()}Repository;\n" +
-                "\n"
+        "\tpublic ${String.capitalize(it)}Repository ${it.lowercase()}Repository;\n" +
+        "\n"
     }
 
     val packageStatement = "package $packagePath.java.service;\n"

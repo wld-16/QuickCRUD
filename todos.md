@@ -1,0 +1,6 @@
+- Relationships between Entities
+- Generate Rest Controller Endpoints
+- Generate GraphQL Mappings
+- Testable Backend in Spring Boot
+- Testable Frontend in Vue 
+- 
