@@ -2,11 +2,12 @@ package wld.accelerate.pipelinec
 
 import wld.accelerate.pipelinec.extension.capitalize
 import wld.accelerate.pipelinec.extension.unCapitalize
+import java.util.regex.Pattern
 
 fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
     val sqlTableHead: (String) -> String = { "CREATE TABLE $it (\n" }
     val sqlTableFieldTemplate: (String, String) -> String = { fieldName, fieldType ->
-        "\t$fieldName: " +
+        "\t$fieldName " +
                 if (fieldType == "Integer") {
                     "INTEGER,"
                 } else if (fieldType == "Enum") {
@@ -17,21 +18,21 @@ fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
     }
     val sqlTableFoot = "\n);"
 
-    val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
-        "$fieldName: $fieldType" +
-                when (fieldType) {
-                    "String" -> "\"\""
-                    else -> "null"
-                }
-    }
 
     val sqlTableField = entities.entries.associate { entity ->
         val fields = (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
-            sqlTableFieldTemplate(it.key, it.value as String)
+            sqlTableFieldTemplate(
+                it.key.split(Pattern.compile("(?=[A-Z])")).joinToString(separator = "_") {
+                    literal -> literal.lowercase() }, it.value as String
+            )
         }
         val returnValue = sqlTableHead(entity.key) +
-                fields.substring(0, fields.length - 1) +
-                sqlTableFoot
+                "\tID SERIAL CONSTRAINT ${entity.key.split(Pattern.compile("(?=[A-Z])")).joinToString(separator = "_") {
+                        literal -> String.unCapitalize()literal.lowercase() }.uppercase()}_PK PRIMARY KEY, \n" +
+                fields.substring(0, fields.length - 1).uppercase() +
+                sqlTableFoot +
+                "\nALTER TABLE ${entity.key} ALTER COLUMN id SET DEFAULT nextval('${entity.key.split(Pattern.compile("(?=[A-Z])")).joinToString(separator = "_") {
+                        literal -> literal.lowercase() }}_seq'::regclass);"
         entity.key to returnValue
     }
     return sqlTableField
@@ -44,7 +45,9 @@ fun writeJavaEnums(enums: LinkedHashMap<String, String>, packagePath: String): M
 
     val enumsFileMap = enums.entries.associate {
         it.key to
-                head(it.key) + (it.value.filterNot { it == '[' || it == ']' || it == ' ' }.split(",").map { entry(it) }
+                head(it.key) + (it.value.filterNot { it == '[' || it == ']' || it == ' ' }
+                    .split(",")
+                    .map { entry(it) }
             .joinToString(separator = "")) + foot
     }
 
@@ -116,10 +119,10 @@ fun writeJavaControllerClasses(controllerEntities: List<String>, packagePath: St
     }
 
     val updateEndpointTemplate: (String) -> String = {
-        "\t@PostMapping(\"/activity/{id}\")\n" +
-                "\tpublic ResponseEntity<ActivityModel> updateActivity(@PathVariable Integer id, ActivityModel activityModel) {\n" +
-                "\t\tActivity activity = activityService.updateActivity(id, activityModel);\n" +
-                "\t\treturn ResponseEntity.ok(ActivityModel.fromActivity(activity));\n" +
+        "\t@PostMapping(\"/${String.unCapitalize(it)}/{id}\")\n" +
+                "\tpublic ResponseEntity<${it}Model> update${it}(@PathVariable Integer id, ${it}Model ${String.unCapitalize(it)}Model) {\n" +
+                "\t\t${it} ${String.unCapitalize(it)} = ${String.unCapitalize(it)}Service.update${it}(id, ${String.unCapitalize(it)}Model);\n" +
+                "\t\treturn ResponseEntity.ok(${it}Model.from${it}(${String.unCapitalize(it)}));\n" +
                 "\t}"
     }
 
@@ -207,9 +210,9 @@ fun writeJavaModelDataClass(models: Map<String, Map<String, Any>>, packagePath: 
 
     val fromTemplate: (String, Map<String, String>) -> String = { it, map ->
         "\tpublic static ${it}Model from$it($it ${String.unCapitalize(it)}) {\n" +
-                "\t\t${it}Model ${it.lowercase()}Model = new ${it}Model();\n" +
-                map.entries.joinToString(separator = "") { entry -> "\t\t${it.lowercase()}Model." + entry.key + " = " + entry.value + ";\n" } +
-                "\t\treturn ${it.lowercase()}Model;\n" +
+                "\t\t${it}Model ${String.unCapitalize(it)}Model = new ${it}Model();\n" +
+                map.entries.joinToString(separator = "") { entry -> "\t\t${String.unCapitalize(it)}Model." + entry.key + " = " + entry.value + ";\n" } +
+                "\t\treturn ${String.unCapitalize(it)}Model;\n" +
                 "\t}"
     }
 
@@ -217,8 +220,8 @@ fun writeJavaModelDataClass(models: Map<String, Map<String, Any>>, packagePath: 
         "\tpublic static $it to$it(${it}Model ${String.unCapitalize(it)}Model){\n" +
                 "\t\t$it ${String.unCapitalize(it)} = new $it();\n" +
                 map.entries.joinToString(separator = "") {
-                    entry -> "\t\t${it.lowercase()}Model.set${String.capitalize(entry.key)}(${entry.value});\n" } +
-                "\t\treturn ${it.lowercase()};\n" +
+                    entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.key)}Model(${entry.value});\n" } +
+                "\t\treturn ${String.unCapitalize(it)};\n" +
                 "\t}"
 
     }
@@ -305,7 +308,7 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
 
     val autowiredComponents: (String) -> String = {
         "\t@Autowired\n" +
-        "\tpublic ${String.capitalize(it)}Repository ${it.lowercase()}Repository;\n" +
+        "\tpublic ${String.capitalize(it)}Repository ${String.unCapitalize(it)}Repository;\n" +
         "\n"
     }
 
@@ -313,13 +316,13 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
 
     val findByIdMethodTemplate: (String) -> String = {
         "\tpublic $it findById(Integer id) {\n" +
-                "\t\treturn ${it.lowercase()}Repository.findById(id).orElseThrow();\n" +
+                "\t\treturn ${String.unCapitalize(it)}Repository.findById(id).orElseThrow();\n" +
                 "\t}"
     }
 
     val findAllTemplate: (String) -> String = {
         "\tpublic List<$it> findAll() {\n" +
-                "\t\treturn ${it.lowercase()}Repository.findAll();\n" +
+                "\t\treturn ${String.unCapitalize(it)}Repository.findAll();\n" +
                 "\t}"
     }
 
@@ -334,7 +337,7 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
         "\tpublic $it update$it(Integer id, ${it}Model ${String.unCapitalize(it)}Model){\n" +
                 "\t\t$it ${String.unCapitalize(it)} = findById(id);\n" +
                 map.entries.joinToString(separator = "") {
-                        entry -> "\t\t${it.lowercase()}.set${String.capitalize(entry.key)}(${entry.value});\n" } +
+                        entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.key)}(${entry.value});\n" } +
                 "\t\treturn ${String.unCapitalize(it)}Repository.save(${String.unCapitalize(it)});\n" +
                 "\t}"
     }
@@ -363,9 +366,11 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
     val enumImportTemplate: (String) -> String =
         { if (it == "String" || it == "Integer") "" else "\nimport $packagePath.java.$it;" }
 
-    val defaultIdTemplate: String = "\n\t@Id\n" +
-            "\t@GeneratedValue\n" +
+    val defaultIdTemplate: (String) -> String = { "\n\t@Id\n" +
+            "\t@SequenceGenerator(name=\"${String.unCapitalize(it)}_id_seq\", sequenceName=\"${String.unCapitalize(it)}_id_seq\", allocationSize=1)\n" +
+            "\t@GeneratedValue(strategy = GenerationType.SEQUENCE, generator=\"${String.unCapitalize(it)}_id_seq\")\n" +
             "\tprivate Long id = null;\n"
+    }
 
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
@@ -388,11 +393,8 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
     }
 
     val dataImportHead = "" +
-            "import java.io.Serializable;\n\n" +
-            "import jakarta.persistence.Column;\n" +
-            "import jakarta.persistence.Entity;\n" +
-            "import jakarta.persistence.GeneratedValue;\n" +
-            "import jakarta.persistence.Id;\n"
+            "import java.io.Serializable;\n" +
+            "import jakarta.persistence.*;"
 
     val dataPackageHead: (String) -> String = { "package $it.java.entity;\n\n" }
 
@@ -405,7 +407,7 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
             val returnValue =
                 dataPackageHead(packagePath) + (entity.value as Map<String, *>).entries.joinToString(separator = "") {
                     enumImportTemplate(it.value as String)
-                } + "\n" + dataImportHead + dataClassHead(entity.key) + defaultIdTemplate +
+                } + "\n" + dataImportHead + dataClassHead(entity.key) + defaultIdTemplate(entity.key) +
                         (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
                             fieldTemplate(it.key, it.value as String)
                         } +
@@ -427,9 +429,11 @@ fun writeEntityDataClass(entities: Map<String, Map<String, Any>>, packagePath: S
     val enumImportTemplate: (String) -> String =
         { if (it == "String" || it == "Integer") "" else "\nimport $packagePath.kotlin.$it" }
 
-    val defaultIdTemplate: String = "\t@Id\n" +
-            "\t@GeneratedValue\n" +
-            "\tprivate val id: Long? = null\n"
+    val defaultIdTemplate: (String) -> String = {
+        "\t@Id\n" +
+        "\t@SequenceGenerator(name=\"${it}_id_seq\", sequenceName=\"${it}_id_seq\", allocationSize=1)\n" +
+        "\t@GeneratedValue(strategy = GenerationType.SEQUENCE, generator=\"${it}_id_seq\")\n" +
+        "\tprivate val id: Long? = null\n" }
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
         "\n\t@Column(nullable = false)\n\t" +
@@ -458,7 +462,7 @@ fun writeEntityDataClass(entities: Map<String, Map<String, Any>>, packagePath: S
             val returnValue =
                 dataPackageHead(packagePath) + (entity.value as Map<String, *>).entries.joinToString(separator = "") {
                     enumImportTemplate(it.value as String)
-                } + "\n" + dataImportHead + dataClassHead(entity.key) + defaultIdTemplate +
+                } + "\n" + dataImportHead + dataClassHead(entity.key) + defaultIdTemplate(entity.key) +
                         (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
                             fieldTemplate(it.key, it.value as String)
                         } +

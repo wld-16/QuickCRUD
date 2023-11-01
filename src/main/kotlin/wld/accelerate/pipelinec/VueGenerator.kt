@@ -6,7 +6,8 @@ fun writeVueRouterJs(entities: Map<String, Map<String, Any>>): String {
     val staticImportStatements = "import { createRouter, createWebHistory } from 'vue-router'\n"
     val dynamicImportStatements: (String) -> String = {
         "import ${it}Details from \"@/components/${it}Details.vue\";\n" +
-                "import ${it}List from \"@/components/${it}List.vue\";\n"
+        "import ${it}List from \"@/components/${it}List.vue\";\n" +
+        "import ${it}CreateForm from \"@/components/${it}CreateForm.vue\";\n"
     }
     val routesHead =
         "const routes = [\n" +
@@ -16,15 +17,20 @@ fun writeVueRouterJs(entities: Map<String, Map<String, Any>>): String {
                 "\t\tcomponent: LandingPage\n" +
                 "\t},\n"
     val routesTemplate: (String) -> String = {
-        "{\n" +
+                "\t{\n" +
                 "\t\tpath: '/${String.unCapitalize(it)}/:id',\n" +
                 "\t\tname: '${String.unCapitalize(it)}-details',\n" +
                 "\t\tcomponent: ${it}Details\n" +
                 "\t}" +
                 ", {\n" +
-                "\t\tpath: '/${String.unCapitalize(it)}-list',\n" +
+                "\t\tpath: '/${String.unCapitalize(it)}/list',\n" +
                 "\t\tname: '${String.unCapitalize(it)}-list',\n" +
                 "\t\tcomponent: ${it}List\n" +
+                "\t}" +
+                ", {\n" +
+                "\t\tpath: '/${String.unCapitalize(it)}/create',\n" +
+                "\t\tname: '${String.unCapitalize(it)}-create',\n" +
+                "\t\tcomponent: ${it}CreateForm\n" +
                 "\t}"
     }
     val routesFoot = "]\n"
@@ -40,6 +46,7 @@ fun writeVueRouterJs(entities: Map<String, Map<String, Any>>): String {
 
     return staticImportStatements +
             entities.keys.joinToString(separator = "") { dynamicImportStatements(it) } +
+            "import LandingPage from \"@/components/LandingPage.vue\";\n" +
             "\n" +
             routesHead +
             entities.keys.joinToString { routesTemplate(it) } +
@@ -121,10 +128,67 @@ fun writeVueLandingPageComponentTemplate(entities: List<String>): String {
             "          ${it}-List\n" +
             "        </router-link>\n" +
             "      </v-col>\n" +
+            "      <v-col>\n" +
+            "        <router-link :to=\"{ name: '${String.unCapitalize(it)}-create' }\">\n" +
+            "          ${it}-Create\n" +
+            "        </router-link>\n" +
+            "      </v-col>\n" +
             "    </v-row>\n"
     }
 
     return scriptsTag + templateTagHead + entities.joinToString(separator = ""){ templateTagTemplate(it) } + templateTagFoot
+}
+
+fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, String> {
+    val scriptTag: (String, Map<String, Any>) -> String = { entity, fields ->
+        "<script>\n" +
+                "import { reactive } from 'vue';\n" +
+                "import { postData } from \"@/composables/server\";\n" +
+                "export default {\n" +
+                "  setup() {\n" +
+                "    let ${entity}CreateForm = reactive({\n" +
+                fields.entries.joinToString(separator = ",\n") {
+                    if (it.value == "String") {
+                        "      ${it.key}: \"\""
+                    } else if (it.value == "Integer") {
+                        "      ${it.key}: 0"
+                    } else if (it.value == "Boolean") {
+                        "      ${it.key}: false"
+                    } else {
+                        "      ${it.key}: undefined"
+                    }
+                } +
+                "    \n})\n" +
+                "    function save() {\n" +
+                "      postData(\"https://localhost:8080/${entity}/\", name)\n" +
+                "      console.log(${entity}CreateForm)\n" +
+                "    }\n" +
+                "\n" +
+                "    return {\n" +
+                "      ${entity}CreateForm,\n" +
+                "      save\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n" +
+                "</script>"
+    }
+
+    val templateTag: (String) -> String = {
+        "<template>\n" +
+                "  <v-form>\n" +
+                "    <v-row>\n" +
+                "      <v-col>\n" +
+                "        <v-text-field v-model=\"${it}CreateForm.name\" label=\"name\"></v-text-field>\n" +
+                "      </v-col>\n" +
+                "      <v-col>\n" +
+                "        <v-btn @click=\"save()\">Create ${it}</v-btn>\n" +
+                "      </v-col>\n" +
+                "    </v-row>\n" +
+                "  </v-form>\n" +
+                "</template>"
+    }
+
+    return entities.entries.associate { it.key to scriptTag(it.key, it.value) + "\n" + templateTag(it.key) }
 }
 
 fun writeVueDetailsComponentTemplate(entities: Map<String, Map<String, Any>>): Map<String, String> {

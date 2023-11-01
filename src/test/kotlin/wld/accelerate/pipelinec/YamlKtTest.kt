@@ -7,9 +7,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
-
 class YamlKtTest() {
-
     @Test
     fun test_parseYaml() {
         val resourceName = "sample/example.yaml"
@@ -297,6 +295,22 @@ class YamlKtTest() {
         val routerPlugin = writeVueRouterJs(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
         File("src/test/kotlin/wld/accelerate/pipelinec/vue/plugins/router.js").writeText(routerPlugin)
+    }
+
+    @Test
+    fun test_writeVueCreateForm() {
+        val resourceName = "sample/example.yaml"
+
+        val classLoader = javaClass.classLoader
+        val file = File(classLoader.getResource(resourceName)!!.file)
+
+        val yamlMap = parseYaml(file.absolutePath)
+
+        val entityClassRepresentations = writeVueCreateForm(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
+
+        entityClassRepresentations.forEach {
+            File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/" + it.key + "CreateForm" +".vue").writeText(it.value)
+        }
     }
 
     companion object {

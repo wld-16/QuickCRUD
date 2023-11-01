@@ -1,0 +1,13 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: postgres
+      POSTGRES_DB: sample
+    ports:
+      - 32768:5432
+    volumes:
+      - ./src/main/resources/sql/:/docker-entrypoint-initdb.d/
