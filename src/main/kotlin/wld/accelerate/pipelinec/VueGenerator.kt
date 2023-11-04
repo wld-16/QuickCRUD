@@ -201,22 +201,38 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
 
 fun writeVueDetailsComponentTemplate(entities: Map<String, Map<String, Any>>): Map<String, String> {
     val scriptsTagHead: (String) -> String =
-        { "<script setup>\nimport { reactive } from 'vue'\nconst ${String.unCapitalize(it)}Details = reactive({\n" }
+        {
+            "<script setup>\n" +
+                    "import { onMounted, ref } from 'vue'\n" +
+                    "import { useRoute } from \"vue-router\";\n" +
+                    "import { getData } from \"@/composables/server\";\n"
+        }
+
     val scriptsTagFields: (String) -> String = {
-        "  $it: undefined"
+        "  const route = useRoute()\n" +
+            "const ${String.capitalize(it)}Details = ref([])\n" +
+            "const id = route.params.id\n"
     }
-    val scriptsTagFoot = "\n\t})\n</script>"
+
+    val scriptsTagLifecycleHooks: (String) -> String = {
+        "onMounted(() => {\n" +
+                "  getData(\"https://localhost:8080/${String.unCapitalize(it)}/\" + id).then(response => {\n" +
+                "    ${it}Details.value = response\n" +
+                "  })\n" +
+                "})"
+    }
+
+    val scriptsTagFoot = "\n</script>"
 
     val scriptTags = entities.entries.associate {
-        val fields = it.value.keys.joinToString(separator = ",\n") { field -> scriptsTagFields(field) }
-        it.key to (scriptsTagHead(it.key) + fields + scriptsTagFoot + "\n" + "\n")
+        it.key to (scriptsTagHead(it.key) + "\n" + scriptsTagFields(it.key) + "\n" + scriptsTagLifecycleHooks(it.key) + scriptsTagFoot + "\n" + "\n")
     }
 
     val templateTags = entities.keys.associateWith {
         "<template>\n" +
                 "  <v-table>\n" +
                 "    <tbody>\n" +
-                "    <tr v-for=\"(value, key) in ${String.unCapitalize(it)}Details\" class=\"text-left\" v-bind:key=\"value\">\n" +
+                "    <tr v-for=\"(value, key) in ${it}Details\" class=\"text-left\" v-bind:key=\"value\">\n" +
                 "      <td>{{ key }}</td>\n" +
                 "      <td>{{ value }}</td>\n" +
                 "    </tr>\n" +
