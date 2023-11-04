@@ -1,5 +1,6 @@
 package wld.accelerate.pipelinec
 
+import wld.accelerate.pipelinec.extension.capitalize
 import wld.accelerate.pipelinec.extension.unCapitalize
 
 fun writeVueRouterJs(entities: Map<String, Map<String, Any>>): String {
@@ -59,19 +60,26 @@ fun writeVueRouterJs(entities: Map<String, Map<String, Any>>): String {
 //}
 
 fun writeVueListComponentTemplate(entities: Map<String, Map<String, Any>>): Map<String, String> {
-    val scriptsTagHead = "<script>\nexport default {\n\tsetup() {\n\t"
-    val scriptActivityList: (String) -> String = { "\tconst ${it}List = []\n" }
-    val scriptHeadersHead = "\t\tconst headers = ["
-    val scriptHeadersFoot = "\n\t\t]\n\t"
+    val scriptsTagHead = "<script setup>\n"
+    val scriptsImport = "import {onMounted, ref} from \"vue\";\n" +
+            "import {getData} from \"@/composables/server\";\n\n"
+
+    val scriptEntityList: (String) -> String = { "const ${it}List = ref([])\n" }
+    val scriptHeadersHead = "const headers = ["
+    val scriptHeadersFoot = "\n]\n"
     val scriptHeadersTemplate: (String) -> String = {field ->
         "\n\t\t\t{ title: '${field}', key: '${field}' }"
     }
 
-    val returnStatement: (String) -> String = {
-        "\treturn {\n\t\t\t${it}List,\n\t\t\theaders\n\t}"
+    val onMounted: (String) -> String = {
+        "\nonMounted(() => {\n" +
+                "  getData(\"https://localhost:8080/${String.unCapitalize(it)}/\").then(response => {\n" +
+                "    ${String.capitalize(it)}List.value = response\n" +
+                "  })\n" +
+                "})\n"
     }
 
-    val scriptClosingStatement = "}\n}\n</script>"
+    val scriptClosingStatement = "</script>"
 
     val templateStatement: (String) -> String = { "<template>\n" +
             "  <v-data-table\n" +
@@ -85,11 +93,12 @@ fun writeVueListComponentTemplate(entities: Map<String, Map<String, Any>>): Map<
     return entities.entries.associate {entry ->
         entry.key to
                 scriptsTagHead +
-                scriptActivityList(entry.key) +
+                scriptsImport +
+                scriptEntityList(entry.key) +
                 scriptHeadersHead +
                 entry.value.keys.joinToString { scriptHeadersTemplate(it) } +
                 scriptHeadersFoot +
-                returnStatement(entry.key) +
+                onMounted(entry.key) +
                 scriptClosingStatement + "\n" +
                 templateStatement(entry.key)
     }
@@ -160,8 +169,7 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                 } +
                 "    \n})\n" +
                 "    function save() {\n" +
-                "      postData(\"https://localhost:8080/${entity}/\", name)\n" +
-                "      console.log(${entity}CreateForm)\n" +
+                "      postData(\"https://localhost:8080/${String.unCapitalize(entity)}/\", ${entity}CreateForm)\n" +
                 "    }\n" +
                 "\n" +
                 "    return {\n" +

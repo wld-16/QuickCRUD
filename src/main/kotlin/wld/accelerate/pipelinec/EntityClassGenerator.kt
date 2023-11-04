@@ -1,11 +1,12 @@
 package wld.accelerate.pipelinec
 
 import wld.accelerate.pipelinec.extension.capitalize
+import wld.accelerate.pipelinec.extension.snakeCase
 import wld.accelerate.pipelinec.extension.unCapitalize
 import java.util.regex.Pattern
 
 fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
-    val sqlTableHead: (String) -> String = { "CREATE TABLE $it (\n" }
+    val sqlTableHead: (String) -> String = { "CREATE TABLE ${String.snakeCase(it)} (\n" }
     val sqlTableFieldTemplate: (String, String) -> String = { fieldName, fieldType ->
         "\t$fieldName " +
                 if (fieldType == "Integer") {
@@ -27,12 +28,11 @@ fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
             )
         }
         val returnValue = sqlTableHead(entity.key) +
-                "\tID SERIAL CONSTRAINT ${entity.key.split(Pattern.compile("(?=[A-Z])")).joinToString(separator = "_") {
-                        literal -> String.unCapitalize()literal.lowercase() }.uppercase()}_PK PRIMARY KEY, \n" +
+                "\tID SERIAL CONSTRAINT ${String.snakeCase(entity.key).uppercase()}_PK PRIMARY KEY, \n" +
                 fields.substring(0, fields.length - 1).uppercase() +
                 sqlTableFoot +
-                "\nALTER TABLE ${entity.key} ALTER COLUMN id SET DEFAULT nextval('${entity.key.split(Pattern.compile("(?=[A-Z])")).joinToString(separator = "_") {
-                        literal -> literal.lowercase() }}_seq'::regclass);"
+                "\nALTER TABLE ${String.snakeCase(entity.key)} ALTER COLUMN id SET DEFAULT nextval('${entity.key.split(Pattern.compile("(?=[A-Z])")).joinToString(separator = "_") {
+                        literal -> literal.lowercase() }}_id_seq'::regclass);"
         entity.key to returnValue
     }
     return sqlTableField
@@ -74,10 +74,7 @@ fun writeJavaControllerClasses(controllerEntities: List<String>, packagePath: St
     val importStatements: (String) -> String = {
                 "import org.springframework.beans.factory.annotation.Autowired;\n" +
                 "import org.springframework.http.ResponseEntity;\n" +
-                "import org.springframework.web.bind.annotation.GetMapping;\n" +
-                "import org.springframework.web.bind.annotation.PostMapping;\n" +
-                "import org.springframework.web.bind.annotation.PathVariable;\n" +
-                "import org.springframework.web.bind.annotation.RestController;\n" +
+                "import org.springframework.web.bind.annotation.*;;\n" +
                 "import wld.accelerate.pipelinec.java.entity.${it};\n" +
                 "import wld.accelerate.pipelinec.java.model.${it}Model;\n" +
                 "import wld.accelerate.pipelinec.java.service.${it}Service;\n" +
@@ -112,7 +109,7 @@ fun writeJavaControllerClasses(controllerEntities: List<String>, packagePath: St
 
     val saveEndpointTemplate: (String) -> String = {
         "\t@PostMapping(\"/${String.unCapitalize(it)}/\")\n" +
-                "\tpublic ResponseEntity<${it}Model> save${it}(${it}Model ${String.unCapitalize(it)}Model) {\n" +
+                "\tpublic ResponseEntity<${it}Model> save${it}(@RequestBody ${it}Model ${String.unCapitalize(it)}Model) {\n" +
                 "\t\t${it} ${String.unCapitalize(it)} = ${String.unCapitalize(it)}Service.create${it}(${String.unCapitalize(it)}Model);\n" +
                 "\t\treturn ResponseEntity.ok(${it}Model.from${it}(${String.unCapitalize(it)}));\n" +
                 "\t}"
@@ -220,7 +217,7 @@ fun writeJavaModelDataClass(models: Map<String, Map<String, Any>>, packagePath: 
         "\tpublic static $it to$it(${it}Model ${String.unCapitalize(it)}Model){\n" +
                 "\t\t$it ${String.unCapitalize(it)} = new $it();\n" +
                 map.entries.joinToString(separator = "") {
-                    entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.key)}Model(${entry.value});\n" } +
+                    entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.key)}(${entry.value});\n" } +
                 "\t\treturn ${String.unCapitalize(it)};\n" +
                 "\t}"
 
@@ -244,7 +241,7 @@ fun writeJavaModelDataClass(models: Map<String, Map<String, Any>>, packagePath: 
                         fieldTemplate(it.key, it.value as String)
                     } + "\n" +
                     fromTemplate(entity.key, entity.value.entries.associate { entry -> entry.key to "${String.unCapitalize(entity.key)}.get${String.capitalize(entry.key)}()" }) + "\n" +
-                    toModelTemplate(entity.key, entity.value.entries.associate { entry -> entry.key to "${String.unCapitalize(entity.key)}.get${String.capitalize(entry.key)}()" }) + "\n" +
+                    toModelTemplate(entity.key, entity.value.entries.associate { entry -> entry.key to "${String.unCapitalize(entity.key)}Model.get${String.capitalize(entry.key)}()" }) + "\n" +
                     (entity.value as Map<String, *>).entries.joinToString(separator = "") {
                         getMethodTemplate(it.key, it.value as String)
                     } +
