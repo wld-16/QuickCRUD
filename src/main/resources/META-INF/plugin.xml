@@ -30,11 +30,11 @@
 
   <actions>
     <action
-            id="wld.accelerate.pipelinec.EntityGenerator"
-            class="wld.accelerate.pipelinec.EntityGenerator"
-            text="Generate Entities"
+            id="wld.accelerate.pipelinec.EnumGenerator"
+            class="wld.accelerate.pipelinec.EnumGenerator"
+            text="Generate Enums"
             description="SDK action example">
-      <override-text place="MainMenu" text="Generate Entities"/>
+      <override-text place="MainMenu" text="Generate Enums"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
   </actions>
