@@ -51,9 +51,9 @@ class YamlGenerateJavaKtTest() {
 
         writeJavaControllerClasses(listOf(), (yamlMap?.get("packagePath") as String) + ".controller")
 
-        val entityClassRepresentations = writeJavaControllerClasses((yamlMap["entities"] as Map<String, *>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.controller")
+        val controllerClassRepresentations = writeJavaControllerClasses((yamlMap["entities"] as Map<String, *>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.controller")
 
-        entityClassRepresentations.forEach{
+        controllerClassRepresentations.forEach{
             File("src/test/kotlin/wld/accelerate/pipelinec/java/controller/" + it.key + "Controller.java").writeText(it.value)
         }
     }
@@ -68,9 +68,9 @@ class YamlGenerateJavaKtTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val entityClassRepresentations = writeJavaRepositoryDataClass((yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.repository")
+        val repositoryClassRepresentation = writeJavaRepositoryDataClass((yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.repository")
 
-        entityClassRepresentations.forEach{
+        repositoryClassRepresentation.forEach{
             File("src/test/kotlin/wld/accelerate/pipelinec/java/repository/" + it.key + "Repository.java").writeText(it.value)
         }
     }

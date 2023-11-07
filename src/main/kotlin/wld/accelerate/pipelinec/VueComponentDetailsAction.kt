@@ -8,9 +8,11 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import org.jetbrains.annotations.NotNull
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 
 
-class EnumGenerator : AnAction() {
+class VueComponentDetailsAction : AnAction() {
     override fun update(@NotNull event: AnActionEvent) {
         // Using the event, evaluate the context,
         // and enable or disable the action.
@@ -24,18 +26,16 @@ class EnumGenerator : AnAction() {
 
     override fun actionPerformed(@NotNull event: AnActionEvent) {
         FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFileDescriptor(), event.project, null) {
-                val file = it.canonicalFile
+            val file = it.canonicalFile
+            val yamlMap = parseYaml(file!!.path)
 
-                val yamlMap = parseYaml(file!!.path)
+            val vueDetailsComponentRepresentation = writeVueDetailsComponentTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
-                val linkedHashMap = yamlMap?.get("enums") as LinkedHashMap<String, String>
+            val basePath = event.project!!.basePath + "/src/res/vue/"
 
-                val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
-
-                enumClassRepresentations.forEach { fileEntry ->
-                    File(event.project!!.basePath + "/src/" + fileEntry.key + ".java").writeText(fileEntry.value)
-                }
-
+            vueDetailsComponentRepresentation.forEach { fileToContent ->
+                File(basePath + fileToContent.key + "List" +".vue").writeText(fileToContent.value)
+            }
         }
 
         // Using the event, implement an action.

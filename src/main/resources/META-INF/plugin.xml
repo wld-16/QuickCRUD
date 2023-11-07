@@ -30,11 +30,67 @@
 
   <actions>
     <action
-            id="wld.accelerate.pipelinec.EnumGenerator"
-            class="wld.accelerate.pipelinec.EnumGenerator"
+            id="wld.accelerate.pipelinec.EnumGeneratorAction"
+            class="wld.accelerate.pipelinec.EnumGeneratorAction"
             text="Generate Enums"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Enums"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.EntityGeneratorAction"
+            class="wld.accelerate.pipelinec.EntityGeneratorAction"
+            text="Generate Enums"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate Entity Class"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.VueComponentListAction"
+            class="wld.accelerate.pipelinec.VueComponentListAction"
+            text="Generate Vue List Components"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate Vue List Component"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.VueComponentFormAction"
+            class="wld.accelerate.pipelinec.VueComponentFormAction"
+            text="Generate Vue Form Components"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate Vue Form Component"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.VueComponentDetailsAction"
+            class="wld.accelerate.pipelinec.VueComponentDetailsAction"
+            text="Generate Vue Details Components"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate Vue Details Component"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.VueGeneratorAction"
+            class="wld.accelerate.pipelinec.VueGeneratorAction"
+            text="Generate All Vue Components"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate All Vue Components"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.DDLGeneratorAction"
+            class="wld.accelerate.pipelinec.DDLGeneratorAction"
+            text="Generate SQL"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate DDL"/>
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+    <action
+            id="wld.accelerate.pipelinec.FullApplicationGeneratorAction"
+            class="wld.accelerate.pipelinec.FullApplicationGeneratorAction"
+            text="Generate Application"
+            description="SDK action example">
+      <override-text place="MainMenu" text="Generate Full Application"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
   </actions>
