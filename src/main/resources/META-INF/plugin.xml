@@ -94,4 +94,7 @@
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
   </actions>
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="crud-pipeline" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" factoryClass="wld.accelerate.pipelinec.PipelineToolWindowFactory" anchor="right"></toolWindow>
+  </extensions>
 </idea-plugin>

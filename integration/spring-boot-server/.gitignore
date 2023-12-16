@@ -35,3 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
+/src/main/java/wld/accelerate/pipelinec/java/model/
+/src/main/java/wld/accelerate/pipelinec/java/controller/
+/src/main/java/wld/accelerate/pipelinec/java/entity/
+/src/main/java/wld/accelerate/pipelinec/java/model/
+/src/main/java/wld/accelerate/pipelinec/java/repository/
+/src/main/java/wld/accelerate/pipelinec/java/service/
+/src/main/java/wld/accelerate/pipelinec/java/entity/
+/src/main/java/wld/accelerate/pipelinec/java/entity/
+/src/main/resources/sql/
