@@ -52,6 +52,20 @@ class YamlGenerateVueTest() {
         }
     }
 
+
+    @Test
+    fun test_writeNavigationComponent() {
+        val resourceName = "sample/example.yaml"
+
+        val classLoader = javaClass.classLoader
+        val file = File(classLoader.getResource(resourceName)!!.file)
+
+        val yamlMap = parseYaml(file.absolutePath)
+
+        val navigationComponent = writeVueAppNavigation((yamlMap?.get("entities") as Map<String, *>).keys.toList())
+
+        File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/RouteNavigationComponent.vue").writeText(navigationComponent)
+    }
     @Test
     fun test_writeVueLandingPage() {
         val resourceName = "sample/example.yaml"

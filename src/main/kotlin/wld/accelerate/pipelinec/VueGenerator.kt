@@ -118,31 +118,67 @@ fun writeVueLandingPageComponentTemplate(entities: List<String>): String {
                 "</script>"
 
     val templateTagHead =
-            "<template>\n" +
-            "  <v-col>\n"
+        "<template>" +
+        "<v-navigation-drawer>\n" +
+                "    <v-list>\n" +
+                "      <v-list-item title=\"My Application\" subtitle=\"Vuetify\"></v-list-item>\n" +
+                "      <v-divider></v-divider>\n"
 
     val templateTagFoot =
-        "  </v-col>\n" +
+        "    </v-list>\n" +
+                "</v-navigation-drawer>" +
                 "</template>"
 
     val templateTagTemplate: (String) -> String = {
-            "    <v-row>\n" +
-            "      <v-col>\n" +
-            "        <router-link :to=\"{ name: '${String.unCapitalize(it)}-details', params: { id: '1' }}\">\n" +
-            "          ${it}:1\n" +
-            "        </router-link>\n" +
-            "      </v-col>\n" +
-            "      <v-col>\n" +
-            "        <router-link :to=\"{ name: '${String.unCapitalize(it)}-list' }\">\n" +
-            "          ${it}-List\n" +
-            "        </router-link>\n" +
-            "      </v-col>\n" +
-            "      <v-col>\n" +
-            "        <router-link :to=\"{ name: '${String.unCapitalize(it)}-create' }\">\n" +
-            "          ${it}-Create\n" +
-            "        </router-link>\n" +
-            "      </v-col>\n" +
-            "    </v-row>\n"
+                    "      <v-list-item link=\"${String.unCapitalize(it)}:1\">\n" +
+                    "        ${it}:1\n" +
+                    "      </v-list-item>\n" +
+                    "      <v-list-item link=\"${String.unCapitalize(it)}-list\">\n" +
+                    "        ${it}-List\n" +
+                    "      </v-list-item>\n" +
+                    "      <v-list-item link=\"${String.unCapitalize(it)}-create\">\n" +
+                    "        ${it}-Create\n" +
+                    "      </v-list-item>\n"
+    }
+
+    return scriptsTag + templateTagHead + "Hello" + templateTagFoot
+}
+
+fun writeVueAppNavigation(entities: List<String>): String {
+    val scriptsTag =
+        "<script>\n" +
+                "export default {\n" +
+                "  setup() {\n" +
+                "    const name = 'RouteNavigationComponent'\n" +
+                "    return {\n" +
+                "      name\n" +
+                "    }\n" +
+                "  },\n" +
+                "}\n" +
+                "</script>"
+
+    val templateTagHead =
+        "<template>" +
+                "<v-navigation-drawer>\n" +
+                "    <v-list>\n" +
+                "      <v-list-item title=\"My Application\" subtitle=\"Vuetify\"></v-list-item>\n" +
+                "      <v-divider></v-divider>\n"
+
+    val templateTagFoot =
+        "    </v-list>\n" +
+                "</v-navigation-drawer>" +
+                "</template>"
+
+    val templateTagTemplate: (String) -> String = {
+        "      <v-list-item to=\"/${String.unCapitalize(it)}/1\" link=\"${String.unCapitalize(it)}:1\">\n" +
+                "        ${it}:1\n" +
+                "      </v-list-item>\n" +
+                "      <v-list-item to=\"/${String.unCapitalize(it)}/list\" link=\"${String.unCapitalize(it)}-list\">\n" +
+                "        ${it}-List\n" +
+                "      </v-list-item>\n" +
+                "      <v-list-item to=\"/${String.unCapitalize(it)}/create\" link=\"${String.unCapitalize(it)}-create\">\n" +
+                "        ${it}-Create\n" +
+                "      </v-list-item>\n"
     }
 
     return scriptsTag + templateTagHead + entities.joinToString(separator = ""){ templateTagTemplate(it) } + templateTagFoot
@@ -181,22 +217,32 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                 "</script>"
     }
 
-    val templateTag: (String) -> String = {
+    val textFieldTag: (Pair<String, String>) -> String = {
+        "        <v-text-field v-model=\"${it.first}CreateForm.${it.second}\" label=\"${it.second}\"></v-text-field>\n"
+    }
+
+    val templateTag: (String, List<String>) -> String = { entity, fields ->
         "<template>\n" +
                 "  <v-form>\n" +
                 "    <v-row>\n" +
                 "      <v-col>\n" +
-                "        <v-text-field v-model=\"${it}CreateForm.name\" label=\"name\"></v-text-field>\n" +
+                fields.joinToString(separator = ""){ field ->
+                    textFieldTag(entity to field)
+                } +
                 "      </v-col>\n" +
                 "      <v-col>\n" +
-                "        <v-btn @click=\"save()\">Create ${it}</v-btn>\n" +
+                "        <v-btn @click=\"save()\">Create ${entity}</v-btn>\n" +
                 "      </v-col>\n" +
                 "    </v-row>\n" +
                 "  </v-form>\n" +
                 "</template>"
     }
 
-    return entities.entries.associate { it.key to scriptTag(it.key, it.value) + "\n" + templateTag(it.key) }
+    return entities.entries.associate {
+        it.key to scriptTag(it.key, it.value) +
+                "\n" +
+            templateTag(it.key, it.value.keys.toList())
+        }
 }
 
 fun writeVueDetailsComponentTemplate(entities: Map<String, Map<String, Any>>): Map<String, String> {

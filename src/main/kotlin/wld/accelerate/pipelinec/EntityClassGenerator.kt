@@ -444,10 +444,7 @@ fun writeEntityDataClass(entities: Map<String, Map<String, Any>>, packagePath: S
 
     val dataImportHead = "" +
             "import java.io.Serializable\n\n" +
-            "import jakarta.persistence.Column\n" +
-            "import jakarta.persistence.Entity\n" +
-            "import jakarta.persistence.GeneratedValue\n" +
-            "import jakarta.persistence.Id\n"
+            "import jakarta.persistence.*\n"
 
     val dataPackageHead: (String) -> String = { "package $it.kotlin.entity\n\n" }
 

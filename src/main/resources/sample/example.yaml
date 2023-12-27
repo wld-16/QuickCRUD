@@ -42,6 +42,13 @@ entities:
 
   Activity:
     name: String
+    description: String
+    rating: Integer
+    spectrum: String
+
+  Spectrum:
+    left_end: String
+    right_end: String
 
   Contact:
     forename: String

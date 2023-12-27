@@ -1,11 +1,22 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <router-view></router-view>
+  <v-app>
+    <v-row>
+      <v-col cols="2">
+        <RouteNavigationComponent></RouteNavigationComponent>
+      </v-col>
+      <v-col>
+        <router-view></router-view>
+      </v-col>
+    </v-row>
+  </v-app>
 </template>
 
 <script>
+import RouteNavigationComponent from "@/components/RouteNavigationComponent.vue";
+
 export default {
   name: 'App',
+  components: {RouteNavigationComponent},
 }
 </script>
 

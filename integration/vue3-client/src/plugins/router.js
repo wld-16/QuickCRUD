@@ -23,6 +23,9 @@ import OpportunityCreateForm from "@/components/OpportunityCreateForm.vue";
 import ActivityDetails from "@/components/ActivityDetails.vue";
 import ActivityList from "@/components/ActivityList.vue";
 import ActivityCreateForm from "@/components/ActivityCreateForm.vue";
+import SpectrumDetails from "@/components/SpectrumDetails.vue";
+import SpectrumList from "@/components/SpectrumList.vue";
+import SpectrumCreateForm from "@/components/SpectrumCreateForm.vue";
 import ContactDetails from "@/components/ContactDetails.vue";
 import ContactList from "@/components/ContactList.vue";
 import ContactCreateForm from "@/components/ContactCreateForm.vue";
@@ -130,6 +133,18 @@ const routes = [
 		path: '/activity/create',
 		name: 'activity-create',
 		component: ActivityCreateForm
+	}, 	{
+		path: '/spectrum/:id',
+		name: 'spectrum-details',
+		component: SpectrumDetails
+	}, {
+		path: '/spectrum/list',
+		name: 'spectrum-list',
+		component: SpectrumList
+	}, {
+		path: '/spectrum/create',
+		name: 'spectrum-create',
+		component: SpectrumCreateForm
 	}, 	{
 		path: '/contact/:id',
 		name: 'contact-details',
