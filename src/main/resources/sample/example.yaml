@@ -44,11 +44,11 @@ entities:
     name: String
     description: String
     rating: Integer
-    spectrum: String
+    spectrum: Object
 
   Spectrum:
-    left_end: String
-    right_end: String
+    leftEnd: String
+    rightEnd: String
 
   Contact:
     forename: String
