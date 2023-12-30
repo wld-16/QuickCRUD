@@ -47,6 +47,7 @@ entities:
     spectrum: Object
 
   Spectrum:
+    name: String
     leftEnd: String
     rightEnd: String
 
