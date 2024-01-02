@@ -84,10 +84,7 @@ class PipelineToolWindowFactory : ToolWindowFactory {
             val creatingConfigTree = Tree(createConfigNode)
             val generatingTree = Tree(generateNode)
 
-            creatingConfigTree.addMouseListener(object : MouseAdapter() {
-
-            })
-
+            creatingConfigTree.addMouseListener(createMouseTreeListener(creatingConfigTree, toolWindow))
             generatingTree.addMouseListener(generatingMouseTreeListener(generatingTree, toolWindow))
             println("has added tree selection listener")
 
