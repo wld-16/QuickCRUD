@@ -9,6 +9,7 @@ import wld.accelerate.pipelinec.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
+import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.tree.DefaultMutableTreeNode
@@ -122,7 +123,34 @@ fun createMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAd
                         val createConfigDialog = CreateConfigDialog()
 
                         if (createConfigDialog.showAndGet()) {
-                            // user pressed OK
+                            val entityName = createConfigDialog.fieldName?.text
+                            val fields = mutableMapOf<String,Any>()
+
+                            for(i in 0..(createConfigDialog.jbTable!!.model!!.rowCount - 1)){
+                                fields[createConfigDialog.jbTable?.model?.getValueAt(i,0).toString()] = createConfigDialog.jbTable!!.model!!.getValueAt(i,1).toString()
+                            }
+
+                            //File(toolWindow.project.basePath + "/src/res/config.yaml")
+                            //    .writeText(entityName + "\n" + fields.entries.joinToString(separator = "\n") { it.key + ": " + it.value })
+
+
+                            val file = File(toolWindow.project.basePath + "/src/res/config.yaml")
+
+                            try { parseYaml(file.absolutePath) }
+                            catch (e: FileNotFoundException) {
+                                File(toolWindow.project.basePath + "/src/res/config.yaml").writeText("")
+                            }
+                            val yamlMap = parseYaml(file.absolutePath)
+
+
+
+                            val entitiesMap: MutableMap<String, Map<String, Any>> =
+                                if(yamlMap?.containsKey("entities") == true) yamlMap["entities"] as MutableMap<String, Map<String, Any>>
+                                else mutableMapOf<String, Map<String, Any>>()
+                            entitiesMap[entityName!!] = fields as Map<String, Any>
+
+                            file.writeText("\n" + "entities:" + "\n  " + entityName + ":\n        " + fields.entries.joinToString(separator = "\n        ") { it.key + ": " + it.value })
+                            Messages.showInfoMessage( "\n" + "entities:" + "\n\t" + fields.entries.joinToString(separator = "\n\t\t") { it.key + ": " + it.value },"entity")
                         }
                     }
                 }
