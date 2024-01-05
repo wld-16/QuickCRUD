@@ -2,7 +2,6 @@ package wld.accelerate.pipelinec.extension
 
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.treeStructure.Tree
 import wld.accelerate.pipelinec.*
@@ -118,43 +117,82 @@ fun createMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAd
                     if (lastPathComponent is DefaultMutableTreeNode) {
                         val userObject = lastPathComponent.userObject
 
-                        Messages.showInfoMessage("" + mouseEvent.x + " - " + mouseEvent.y, "Tree Click")
+                        if ("entities" == userObject) {
+                            val createEntitiyDialog = CreateEntitiyDialog()
 
-                        val createConfigDialog = CreateConfigDialog()
+                            if (createEntitiyDialog.showAndGet()) {
+                                val entityName = createEntitiyDialog.fieldName?.text
+                                val fields = mutableMapOf<String,Any>()
 
-                        if (createConfigDialog.showAndGet()) {
-                            val entityName = createConfigDialog.fieldName?.text
-                            val fields = mutableMapOf<String,Any>()
+                                for(i in 0..(createEntitiyDialog.jbTable!!.model!!.rowCount - 1)){
+                                    fields[createEntitiyDialog.jbTable?.model?.getValueAt(i,0).toString()] = createEntitiyDialog.jbTable!!.model!!.getValueAt(i,1).toString()
+                                }
 
-                            for(i in 0..(createConfigDialog.jbTable!!.model!!.rowCount - 1)){
-                                fields[createConfigDialog.jbTable?.model?.getValueAt(i,0).toString()] = createConfigDialog.jbTable!!.model!!.getValueAt(i,1).toString()
+                                val file = File(toolWindow.project.basePath + "/src/res/config.yaml")
+
+                                try { parseYaml(file.absolutePath) }
+                                catch (e: FileNotFoundException) {
+                                    File(toolWindow.project.basePath + "/src/res/config.yaml").writeText("")
+                                }
+                                val yamlMap = parseYaml(file.absolutePath)
+
+                                val entitiesMap: MutableMap<String, Map<String, Any>> =
+                                    if(yamlMap?.containsKey("entities") == true) {
+                                        yamlMap["entities"] as MutableMap<String, Map<String, Any>>
+                                    }
+                                    else {
+                                        mutableMapOf<String, Map<String, Any>>()
+                                    }
+                                entitiesMap[entityName!!] = fields as Map<String, Any>
+
+                                file.writeText(writeYamlEntities(entitiesMap))
                             }
+                        } else if("controllers" == userObject) {
+                            val createControllerDialog = CreateControllerDialog()
+                            if (createControllerDialog.showAndGet()) {
+                                val entityName = createControllerDialog.fieldName?.text
+                                val fields = mapOf<ENDPOINT, Boolean>(
+                                    ENDPOINT.CREATE to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.CREATE.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.READ to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.READ.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.READ_ALL to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.READ_ALL.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.UPDATE to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.UPDATE.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.DELETE to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.DELETE.ordinal,1).toString().toBoolean()
+                                )
 
-                            //File(toolWindow.project.basePath + "/src/res/config.yaml")
-                            //    .writeText(entityName + "\n" + fields.entries.joinToString(separator = "\n") { it.key + ": " + it.value })
+                                val file = File(toolWindow.project.basePath + "/src/res/config.yaml")
 
+                                try { parseYaml(file.absolutePath) }
+                                catch (e: FileNotFoundException) {
+                                    File(toolWindow.project.basePath + "/src/res/config.yaml").writeText("")
+                                }
+                                val yamlMap = parseYaml(file.absolutePath)
 
-                            val file = File(toolWindow.project.basePath + "/src/res/config.yaml")
+                                val entitiesMap: MutableMap<String, Map<String, Any>> =
+                                    if(yamlMap?.containsKey("controllers") == true) {
+                                        yamlMap["controllers"] as MutableMap<String, Map<String, Any>>
+                                    }
+                                    else {
+                                        mutableMapOf<String, Map<String, Any>>()
+                                    }
+                                entitiesMap[entityName!!] = fields as Map<String, Any>
 
-                            try { parseYaml(file.absolutePath) }
-                            catch (e: FileNotFoundException) {
-                                File(toolWindow.project.basePath + "/src/res/config.yaml").writeText("")
+                                file.writeText(writeYamlControllers(entityName, entitiesMap))
+
                             }
-                            val yamlMap = parseYaml(file.absolutePath)
+                        } else if("enums" == userObject) {
 
-
-
-                            val entitiesMap: MutableMap<String, Map<String, Any>> =
-                                if(yamlMap?.containsKey("entities") == true) yamlMap["entities"] as MutableMap<String, Map<String, Any>>
-                                else mutableMapOf<String, Map<String, Any>>()
-                            entitiesMap[entityName!!] = fields as Map<String, Any>
-
-                            file.writeText("\n" + "entities:" + "\n  " + entityName + ":\n        " + fields.entries.joinToString(separator = "\n        ") { it.key + ": " + it.value })
-                            Messages.showInfoMessage( "\n" + "entities:" + "\n\t" + fields.entries.joinToString(separator = "\n\t\t") { it.key + ": " + it.value },"entity")
                         }
                     }
                 }
             }
         }
     }
+}
+
+enum class ENDPOINT {
+    CREATE,
+    READ,
+    READ_ALL,
+    UPDATE,
+    DELETE
 }

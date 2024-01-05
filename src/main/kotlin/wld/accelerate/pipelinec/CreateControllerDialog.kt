@@ -1,25 +1,20 @@
 package wld.accelerate.pipelinec
 
-import com.intellij.openapi.roots.ui.componentsList.layout.VerticalStackLayout
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.table.JBTable
-import com.intellij.util.ui.table.JBListTable
 import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.FlowLayout
 import javax.annotation.Nullable
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
-import javax.swing.table.DefaultTableColumnModel
 import javax.swing.table.DefaultTableModel
-import javax.swing.table.JTableHeader
 
 
-class CreateConfigDialog : DialogWrapper(true) {
+class CreateControllerDialog : DialogWrapper(true) {
 
     private var defaultTableModel = DefaultTableModel(arrayOf("name", "type"), 2)
     var jbTable: JBTable? = JBTable(defaultTableModel)
@@ -46,7 +41,13 @@ class CreateConfigDialog : DialogWrapper(true) {
 
         dialogPanel.add(headerPanel, BorderLayout.NORTH)
 
-        defaultTableModel.setColumnIdentifiers(arrayOf("name","type"))
+        defaultTableModel.setColumnIdentifiers(arrayOf("endpoint","isActive"))
+
+        defaultTableModel.addRow(arrayOf("CREATE", true))
+        defaultTableModel.addRow(arrayOf("READ", true))
+        defaultTableModel.addRow(arrayOf("READ_ALL", true))
+        defaultTableModel.addRow(arrayOf("UPDATE", true))
+        defaultTableModel.addRow(arrayOf("DELETE", true))
 
         jbTable!!.model = defaultTableModel
 
@@ -55,15 +56,7 @@ class CreateConfigDialog : DialogWrapper(true) {
 
         jbTable!!.size = Dimension(this.size.width, 100)
 
-        val removeButton = JButton("Remove Row")
-        removeButton.addActionListener { defaultTableModel.removeRow(defaultTableModel.rowCount-1) }
-
-        val addButton = JButton("Add Row")
-        addButton.addActionListener { defaultTableModel.addRow(arrayOf("name","field")) }
-
-        headerPanel.add(removeButton)
         dialogPanel.add(jbTable, BorderLayout.CENTER)
-        dialogPanel.add(addButton, BorderLayout.SOUTH)
 
         return dialogPanel
     }

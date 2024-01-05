@@ -21,7 +21,7 @@ fun CreateConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                 val testButton = JButton()
 
                 testButton.addActionListener { actionEvent: ActionEvent? ->
-                    if (CreateConfigDialog().showAndGet()) {
+                    if (CreateEntitiyDialog().showAndGet()) {
                         // user pressed OK
                     }
                 }
@@ -35,7 +35,7 @@ fun CreateConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                         Messages.showInfoMessage("hello world", "hello")
                         val testButton = JButton()
                         testButton.addActionListener { actionEvent: ActionEvent? ->
-                            if (CreateConfigDialog().showAndGet()) {
+                            if (CreateEntitiyDialog().showAndGet()) {
                                 // user pressed OK
                             }
                         }
