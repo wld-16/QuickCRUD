@@ -397,8 +397,7 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
 
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
-        (if(fieldType == "Object") "\t@ManyToOne\n" else "\n") +
-        "\t@Column(nullable = false)\n\t" +
+        (if(fieldType == "Object") "\t@ManyToOne\n" else "\t@Column(nullable = false)\n\t") +
                 "${if(fieldType == "Object") String.capitalize(fieldName) else fieldType} $fieldName = " +
                 when (fieldType) {
                     "String" -> "\"\";\n"

@@ -16,12 +16,12 @@ import javax.swing.table.DefaultTableModel
 
 class CreateControllerDialog : DialogWrapper(true) {
 
-    private var defaultTableModel = DefaultTableModel(arrayOf("name", "type"), 2)
+    private var defaultTableModel = DefaultTableModel(arrayOf(), 0)
     var jbTable: JBTable? = JBTable(defaultTableModel)
     var fieldName: JTextField? = JTextField("entity name")
     init {
         title = "Create Configuration"
-        defaultTableModel = DefaultTableModel(arrayOf("name", "type"), 2)
+        defaultTableModel = DefaultTableModel(arrayOf(), 0)
         jbTable = JBTable(defaultTableModel)
         fieldName = JTextField("entity name")
         init()

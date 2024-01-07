@@ -11,21 +11,33 @@ fun parseYaml(fileUrl: String): Map<String, Any>? {
 
     val yaml = Yaml()
     val data = yaml.load<Map<String, Any>>(inputStream)
-    println(data)
     return data
 }
 
+fun writePackagePath(packagePath: String): String {
+    return "packagePath: " + packagePath
+}
+
 fun writeYamlEntities(map: Map<String, Map<String, Any>>): String {
-    return "entities:\n  " + map.asSequence()
+    return "\nentities:\n  " + map.asSequence()
         .joinToString(separator = "\n  ") { entityEntry -> entityEntry.key + ":\n    " + entityEntry.value.entries.joinToString(separator = "\n    ") { it.key + ": " + it.value } }
 }
 
 // WIP
-fun writeYamlControllers(entityName: String, map: Map<ENDPOINT, Boolean>): String {
-    return "controllers:\n  $entityName:\n" +
-            "    CREATE: ${map[ENDPOINT.CREATE]!!}\n" +
-            "    READ: ${map[ENDPOINT.READ]!!}\n" +
-            "    READ_ALL: ${map[ENDPOINT.READ_ALL]!!}\n" +
-            "    UPDATE: ${map[ENDPOINT.UPDATE]!!}\n" +
-            "    DELETE: ${map[ENDPOINT.DELETE]!!}"
+fun writeYamlControllersEnum(map: Map<String, Map<ENDPOINT, Boolean>>): String {
+    return "\ncontrollers:" + map.asSequence().joinToString { "\n  ${it.key}:\n" +
+            "    CREATE: ${it.value[ENDPOINT.CREATE]!!}\n" +
+            "    READ: ${it.value[ENDPOINT.READ]!!}\n" +
+            "    READ_ALL: ${it.value[ENDPOINT.READ_ALL]!!}\n" +
+            "    UPDATE: ${it.value[ENDPOINT.UPDATE]!!}\n" +
+            "    DELETE: ${it.value[ENDPOINT.DELETE]!!}" }
+}
+
+fun writeYamlControllers(map: Map<String, Map<String, Boolean>>): String {
+    return "\ncontrollers:" + map.asSequence().joinToString(separator = "") { "\n  ${it.key}:\n" +
+            "    CREATE: ${it.value[ENDPOINT.CREATE.name]!!}\n" +
+            "    READ: ${it.value[ENDPOINT.READ.name]!!}\n" +
+            "    READ_ALL: ${it.value[ENDPOINT.READ_ALL.name]!!}\n" +
+            "    UPDATE: ${it.value[ENDPOINT.UPDATE.name]!!}\n" +
+            "    DELETE: ${it.value[ENDPOINT.DELETE.name]!!}" }
 }

@@ -1,34 +1,18 @@
 package wld.accelerate.pipelinec
 
-import com.intellij.openapi.fileChooser.FileChooser
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.componentsList.layout.VerticalStackLayout
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.treeStructure.Tree
-import org.apache.commons.lang.StringUtils
-import org.jetbrains.annotations.NotNull
-import wld.accelerate.pipelinec.extension.createMouseTreeListener
-import wld.accelerate.pipelinec.extension.generatingMouseTreeListener
-import java.awt.BorderLayout
-import java.awt.GridBagLayout
-import java.awt.GridLayout
-import java.awt.event.ActionEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
+import wld.accelerate.pipelinec.extension.createConfigMouseTreeListener
+import wld.accelerate.pipelinec.extension.generatingClassesMouseTreeListener
 import java.util.*
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.TreePath
 
 
 class BookInfo(s: String, s1: String)
@@ -82,13 +66,13 @@ class PipelineToolWindowFactory : ToolWindowFactory {
             generateNode.add(DefaultMutableTreeNode("vue-landing-page"))
 
             val creatingConfigTree = Tree(createConfigNode)
-            val generatingTree = Tree(generateNode)
+            val generatingClassesTree = Tree(generateNode)
 
-            creatingConfigTree.addMouseListener(createMouseTreeListener(creatingConfigTree, toolWindow))
-            generatingTree.addMouseListener(generatingMouseTreeListener(generatingTree, toolWindow))
+            creatingConfigTree.addMouseListener(createConfigMouseTreeListener(creatingConfigTree, toolWindow))
+            generatingClassesTree.addMouseListener(generatingClassesMouseTreeListener(generatingClassesTree, toolWindow))
             println("has added tree selection listener")
 
-            generatingTreePanel.add(generatingTree)
+            generatingTreePanel.add(generatingClassesTree)
             configTreePanel.add(creatingConfigTree)
 
             rootPanel.add(configTreePanel)
@@ -97,31 +81,6 @@ class PipelineToolWindowFactory : ToolWindowFactory {
 
         private fun setIconLabel(label: JLabel, imagePath: String) {
             label.setIcon(ImageIcon(Objects.requireNonNull(javaClass.getResource(imagePath))))
-        }
-
-        @NotNull
-        private fun createControlsPanel(toolWindow: ToolWindow): JPanel {
-            val controlsPanel = JPanel()
-            val treeActions = Tree()
-
-            val refreshDateAndTimeButton = JButton("Refresh")
-            //refreshDateAndTimeButton.addActionListener { e: ActionEvent? -> updateCurrentDateTime() }
-            controlsPanel.add(refreshDateAndTimeButton)
-            val hideToolWindowButton = JButton("Hide")
-            hideToolWindowButton.addActionListener { e: ActionEvent? -> toolWindow.hide(null) }
-            controlsPanel.add(hideToolWindowButton)
-            return controlsPanel
-        }
-
-        private fun getFormattedValue(calendar: Calendar, calendarField: Int): String {
-            val value: Int = calendar.get(calendarField)
-            return StringUtils.leftPad(value.toString(), 2, "0")
-        }
-
-        companion object {
-            private const val CALENDAR_ICON_PATH = "/toolWindow/Calendar-icon.png"
-            private const val TIME_ZONE_ICON_PATH = "/toolWindow/Time-zone-icon.png"
-            private const val TIME_ICON_PATH = "/toolWindow/Time-icon.png"
         }
     }
 }

@@ -2,6 +2,7 @@ package wld.accelerate.pipelinec.extension
 
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.treeStructure.Tree
 import wld.accelerate.pipelinec.*
@@ -14,7 +15,7 @@ import java.nio.file.Path
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreePath
 
-fun generatingMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAdapter {
+fun generatingClassesMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAdapter {
     return object : MouseAdapter() {
         override fun mouseClicked(mouseEvent: MouseEvent) {
             if (mouseEvent.clickCount === 2) { // Double-click
@@ -107,7 +108,7 @@ fun generatingMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): Mou
     }
 }
 
-fun createMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAdapter {
+fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAdapter {
     return object : MouseAdapter() {
         override fun mouseClicked(mouseEvent: MouseEvent) {
             if (mouseEvent.clickCount === 2) { // Double-click
@@ -145,18 +146,24 @@ fun createMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAd
                                     }
                                 entitiesMap[entityName!!] = fields as Map<String, Any>
 
-                                file.writeText(writeYamlEntities(entitiesMap))
+                                var controllersMap: MutableMap<String, Map<String, Boolean>> = mutableMapOf()
+                                if(yamlMap?.containsKey("controllers") == true) {
+                                    Messages.showInfoMessage("Found another controller", "info")
+                                    (yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>).also { controllersMap = it }
+                                }
+
+                                file.writeText(writePackagePath("wld.accelerate.pipelinec") + writeYamlEntities(entitiesMap) + writeYamlControllers(controllersMap))
                             }
                         } else if("controllers" == userObject) {
                             val createControllerDialog = CreateControllerDialog()
                             if (createControllerDialog.showAndGet()) {
                                 val entityName = createControllerDialog.fieldName?.text
-                                val fields = mapOf<ENDPOINT, Boolean>(
-                                    ENDPOINT.CREATE to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.CREATE.ordinal,1).toString().toBoolean(),
-                                    ENDPOINT.READ to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.READ.ordinal,1).toString().toBoolean(),
-                                    ENDPOINT.READ_ALL to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.READ_ALL.ordinal,1).toString().toBoolean(),
-                                    ENDPOINT.UPDATE to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.UPDATE.ordinal,1).toString().toBoolean(),
-                                    ENDPOINT.DELETE to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.DELETE.ordinal,1).toString().toBoolean()
+                                val fields = mapOf<String, Boolean>(
+                                    ENDPOINT.CREATE.name to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.CREATE.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.READ.name to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.READ.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.READ_ALL.name to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.READ_ALL.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.UPDATE.name to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.UPDATE.ordinal,1).toString().toBoolean(),
+                                    ENDPOINT.DELETE.name to createControllerDialog.jbTable!!.model!!.getValueAt(ENDPOINT.DELETE.ordinal,1).toString().toBoolean()
                                 )
 
                                 val file = File(toolWindow.project.basePath + "/src/res/config.yaml")
@@ -167,16 +174,22 @@ fun createMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAd
                                 }
                                 val yamlMap = parseYaml(file.absolutePath)
 
-                                val entitiesMap: MutableMap<String, Map<String, Any>> =
+                                var controllersMap: MutableMap<String, Map<String, Boolean>> = mutableMapOf()
                                     if(yamlMap?.containsKey("controllers") == true) {
-                                        yamlMap["controllers"] as MutableMap<String, Map<String, Any>>
+                                        Messages.showInfoMessage("Found another controller", "info")
+                                        (yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>).also { controllersMap = it }
+                                    }
+
+                                val entitiesMap: MutableMap<String, Map<String, Any>> =
+                                    if(yamlMap?.containsKey("entities") == true) {
+                                        yamlMap["entities"] as MutableMap<String, Map<String, Any>>
                                     }
                                     else {
                                         mutableMapOf<String, Map<String, Any>>()
                                     }
-                                entitiesMap[entityName!!] = fields as Map<String, Any>
+                                controllersMap[entityName!!] = fields
 
-                                file.writeText(writeYamlControllers(entityName, entitiesMap))
+                                file.writeText(writePackagePath("wld.accelerate.pipelinec") + writeYamlEntities(entitiesMap) + writeYamlControllers(controllersMap))
 
                             }
                         } else if("enums" == userObject) {
