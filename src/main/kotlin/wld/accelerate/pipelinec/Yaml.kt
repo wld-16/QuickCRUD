@@ -19,11 +19,14 @@ fun writePackagePath(packagePath: String): String {
 }
 
 fun writeYamlEntities(map: Map<String, Map<String, Any>>): String {
-    return "\nentities:\n  " + map.asSequence()
+    return "entities:\n  " + map.asSequence()
         .joinToString(separator = "\n  ") { entityEntry -> entityEntry.key + ":\n    " + entityEntry.value.entries.joinToString(separator = "\n    ") { it.key + ": " + it.value } }
 }
 
-// WIP
+fun writeYamlEnums(map: Map<String, List<String>>): String {
+    return "enums:" + map.asSequence().joinToString("") {enumEntry ->
+        "\n  " + enumEntry.key + ": [" + enumEntry.value.joinToString(",") + "]" }
+}
 fun writeYamlControllersEnum(map: Map<String, Map<ENDPOINT, Boolean>>): String {
     return "\ncontrollers:" + map.asSequence().joinToString { "\n  ${it.key}:\n" +
             "    CREATE: ${it.value[ENDPOINT.CREATE]!!}\n" +

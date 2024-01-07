@@ -152,7 +152,11 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                     (yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>).also { controllersMap = it }
                                 }
 
-                                file.writeText(writePackagePath("wld.accelerate.pipelinec") + writeYamlEntities(entitiesMap) + writeYamlControllers(controllersMap))
+                                file.writeText(
+                                    writePackagePath("wld.accelerate.pipelinec") + "\n" +
+                                        writeYamlEntities(entitiesMap) + "\n" +
+                                        writeYamlControllers(controllersMap)
+                                )
                             }
                         } else if("controllers" == userObject) {
                             val createControllerDialog = CreateControllerDialog()
@@ -189,7 +193,11 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                     }
                                 controllersMap[entityName!!] = fields
 
-                                file.writeText(writePackagePath("wld.accelerate.pipelinec") + writeYamlEntities(entitiesMap) + writeYamlControllers(controllersMap))
+                                file.writeText(
+                                    writePackagePath("wld.accelerate.pipelinec") + "\n" +
+                                            writeYamlEntities(entitiesMap) + "\n" +
+                                            writeYamlControllers(controllersMap)
+                                )
 
                             }
                         } else if("enums" == userObject) {
