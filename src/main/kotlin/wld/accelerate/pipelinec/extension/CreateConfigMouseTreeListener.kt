@@ -3,7 +3,7 @@ package wld.accelerate.pipelinec.extension
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.treeStructure.Tree
-import wld.accelerate.pipelinec.*
+import wld.accelerate.pipelinec.dialog.CreateEntitiyDialog
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

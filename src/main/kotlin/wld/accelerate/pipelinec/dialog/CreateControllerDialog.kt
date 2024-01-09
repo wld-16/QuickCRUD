@@ -1,4 +1,4 @@
-package wld.accelerate.pipelinec
+package wld.accelerate.pipelinec.dialog
 
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.VerticalFlowLayout

@@ -1,4 +1,4 @@
-package wld.accelerate.pipelinec
+package wld.accelerate.pipelinec.dialog
 
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.VerticalFlowLayout
@@ -6,22 +6,18 @@ import com.intellij.ui.table.JBTable
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.annotation.Nullable
-import javax.swing.JButton
-import javax.swing.JComponent
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
+import javax.swing.*
 import javax.swing.table.DefaultTableModel
 
 
-class CreateEntitiyDialog : DialogWrapper(true) {
+class CreateEnumDialog : DialogWrapper(true) {
 
-    private var defaultTableModel = DefaultTableModel(arrayOf("name", "type"), 2)
+    private var defaultTableModel = DefaultTableModel(arrayOf(), 0)
     var jbTable: JBTable? = JBTable(defaultTableModel)
     var fieldName: JTextField? = JTextField("entity name")
     init {
         title = "Create Configuration"
-        defaultTableModel = DefaultTableModel(arrayOf("name", "type"), 2)
+        defaultTableModel = DefaultTableModel(arrayOf(), 0)
         jbTable = JBTable(defaultTableModel)
         fieldName = JTextField("entity name")
         init()
@@ -41,7 +37,7 @@ class CreateEntitiyDialog : DialogWrapper(true) {
 
         dialogPanel.add(headerPanel, BorderLayout.NORTH)
 
-        defaultTableModel.setColumnIdentifiers(arrayOf("name","type"))
+        defaultTableModel.setColumnIdentifiers(arrayOf("name"))
 
         jbTable!!.model = defaultTableModel
 
@@ -54,7 +50,7 @@ class CreateEntitiyDialog : DialogWrapper(true) {
         removeButton.addActionListener { defaultTableModel.removeRow(defaultTableModel.rowCount-1) }
 
         val addButton = JButton("Add Row")
-        addButton.addActionListener { defaultTableModel.addRow(arrayOf("name","field")) }
+        addButton.addActionListener { defaultTableModel.addRow(arrayOf("name")) }
 
         headerPanel.add(removeButton)
         dialogPanel.add(jbTable, BorderLayout.CENTER)

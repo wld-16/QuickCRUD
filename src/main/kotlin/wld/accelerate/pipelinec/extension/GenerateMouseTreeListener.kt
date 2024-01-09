@@ -6,6 +6,9 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.treeStructure.Tree
 import wld.accelerate.pipelinec.*
+import wld.accelerate.pipelinec.dialog.CreateControllerDialog
+import wld.accelerate.pipelinec.dialog.CreateEntitiyDialog
+import wld.accelerate.pipelinec.dialog.CreateEnumDialog
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
@@ -198,10 +201,52 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                             writeYamlEntities(entitiesMap) + "\n" +
                                             writeYamlControllers(controllersMap)
                                 )
-
                             }
                         } else if("enums" == userObject) {
+                            val createEnumDialog = CreateEnumDialog()
+                            if (createEnumDialog.showAndGet()) {
+                                val enumName = createEnumDialog.fieldName?.text
+                                val fields = mutableMapOf<String, MutableList<String>>()
 
+                                fields[enumName!!] = mutableListOf<String>()
+
+                                for(i in 0..(createEnumDialog.jbTable!!.model!!.rowCount - 1)){
+                                    // WIP Test
+                                    fields[enumName]!!.add(createEnumDialog.jbTable?.model?.getValueAt(i,0).toString())
+                                }
+                                Messages.showInfoMessage(fields.get(enumName)!!.joinToString(), "join")
+                                val file = File(toolWindow.project.basePath + "/src/res/config.yaml")
+
+                                try { parseYaml(file.absolutePath) }
+                                catch (e: FileNotFoundException) {
+                                    File(toolWindow.project.basePath + "/src/res/config.yaml").writeText("")
+                                }
+                                val yamlMap = parseYaml(file.absolutePath)
+
+                                var controllersMap: MutableMap<String, Map<String, Boolean>> =
+                                if(yamlMap?.containsKey("controllers") == true) {
+                                    yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>
+                                } else mutableMapOf()
+
+                                val entitiesMap: MutableMap<String, Map<String, Any>> =
+                                    if(yamlMap?.containsKey("entities") == true) {
+                                        yamlMap["entities"] as MutableMap<String, Map<String, Any>>
+                                    } else mutableMapOf()
+
+                                var enumsMap: MutableMap<String, List<String>> =
+                                    if(yamlMap?.containsKey("enums") == true) {
+                                        yamlMap["enums"] as MutableMap<String, List<String>>
+                                    } else mutableMapOf()
+
+                                enumsMap[enumName] = fields[enumName]!!
+
+                                file.writeText(
+                                    writePackagePath("wld.accelerate.pipelinec") + "\n" +
+                                            writeYamlEnums(enumsMap) + "\n" +
+                                            writeYamlEntities(entitiesMap) + "\n" +
+                                            writeYamlControllers(controllersMap)
+                                )
+                            }
                         }
                     }
                 }
