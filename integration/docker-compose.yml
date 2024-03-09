@@ -1,0 +1,28 @@
+version: "3.4"
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: postgres
+      POSTGRES_DB: sample
+    ports:
+      - "32768:5432"
+    volumes:
+      - ./spring-boot-server/src/main/resources/sql/:/docker-entrypoint-initdb.d/
+  vite_docker:
+    image: vite_docker
+    build:
+      context: vue3-client
+      dockerfile: vite.dockerfile
+    container_name: vite_docker
+    command: dev
+    ports:
+      - "8001:8001"
+    working_dir: /srv/app
+    volumes:
+      - type: bind
+        source: ./vue3-client/
+        target: /srv/app
+    tty: true
