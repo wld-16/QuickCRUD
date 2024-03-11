@@ -1,5 +1,6 @@
 package wld.accelerate.pipelinec
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.componentsList.layout.VerticalStackLayout
 import com.intellij.openapi.ui.SimpleToolWindowPanel
@@ -8,12 +9,15 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.treeStructure.Tree
+import com.jetbrains.rd.util.string.printToString
 import wld.accelerate.pipelinec.extension.createConfigMouseTreeListener
 import wld.accelerate.pipelinec.extension.generatingClassesMouseTreeListener
 import java.util.*
-import javax.swing.*
+import javax.swing.ImageIcon
+import javax.swing.JLabel
 import javax.swing.tree.DefaultMutableTreeNode
 
+private const val CALENDAR_ICON_PATH = "/toolWindow/Calendar-icon.png"
 
 class BookInfo(s: String, s1: String)
 
@@ -49,14 +53,15 @@ class PipelineToolWindowFactory : ToolWindowFactory {
             //val boxLayoutContainer = Container()
             //configTreePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0))
 
-            val createConfigNode = DefaultMutableTreeNode("Create Config", true)
+            val createConfigNode = DefaultMutableTreeNode(JLabel("Create Config"), true)
+            //setIconForNode(createConfigNode, ImageIcon(AllIcons.Nodes.Package.printToString()))
 
             createConfigNode.add(DefaultMutableTreeNode("enums"))
             createConfigNode.add(DefaultMutableTreeNode("controllers"))
             createConfigNode.add(DefaultMutableTreeNode("entities"))
 
             val generateNode = DefaultMutableTreeNode("generate", true)
-
+            setIconForNode(generateNode, ImageIcon(javaClass.getResource(CALENDAR_ICON_PATH) ))
             generateNode.add(DefaultMutableTreeNode("sql"))
             generateNode.add(DefaultMutableTreeNode("entities"))
             generateNode.add(DefaultMutableTreeNode("controllers"))
@@ -81,6 +86,12 @@ class PipelineToolWindowFactory : ToolWindowFactory {
 
         private fun setIconLabel(label: JLabel, imagePath: String) {
             label.setIcon(ImageIcon(Objects.requireNonNull(javaClass.getResource(imagePath))))
+        }
+
+        private companion object fun setIconForNode(node: DefaultMutableTreeNode, icon: ImageIcon) {
+            val text = node.userObject.toString()
+            node.userObject = icon
+
         }
     }
 }

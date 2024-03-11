@@ -219,9 +219,20 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
                 "\n\t\tthis.$fieldName = $fieldName;\n\t}\n"
     }
 
+    val getIdMethodTemplate: String =
+        "public Long getId() {\n" +
+            "\t\treturn id;\n" +
+            "\t}"
+
+    val setIdMethodTemplate: String =
+        "public void setId(Long id) {\n" +
+                "\t\tthis.id = id;\n" +
+                "\t}"
+
     val fromTemplate: (String, Map<Pair<String, Any>, String>) -> String = { it, map ->
         "\tpublic static ${it}Model from$it($it ${String.unCapitalize(it)}) {\n" +
                 "\t\t${it}Model ${String.unCapitalize(it)}Model = new ${it}Model();\n" +
+                "\t\t${String.unCapitalize(it)}Model.id = ${String.unCapitalize(it)}.getId();\n" +
                 map.entries.joinToString(separator = "") { entry ->
                     "\t\t${String.unCapitalize(it)}Model." + entry.value + " = " +
                             (if(entry.key.second == "Object") String.capitalize(entry.value) + "Model.from" + String.capitalize(entry.value) + "(" else "") +
@@ -233,6 +244,7 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
     val toModelTemplate: (String, Map<Pair<String, Any>, String>) -> String = { it, map ->
         "\tpublic static $it to$it(${it}Model ${String.unCapitalize(it)}Model){\n" +
                 "\t\t$it ${String.unCapitalize(it)} = new $it();\n" +
+                "\t\t${String.unCapitalize(it)}.setId(${String.unCapitalize(it)}Model.getId());\n" +
                 map.entries.joinToString(separator = "") {
                     entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.value)}(" +
                         (if(entry.key.second == "Object") String.capitalize(entry.value) + "Model.to" + String.capitalize(entry.value) + "(" else "") +
@@ -271,7 +283,10 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
                     } +
                     (entityToFieldEntry.value as Map<String, *>).entries.joinToString(separator = "") {
                         setMethodTemplate(it.key, it.value as String)
-                    } + dataClassFoot
+                    } +
+                    "\n" + getIdMethodTemplate +
+                    "\n" + setIdMethodTemplate +
+                    dataClassFoot
             entityToFieldEntry.key to returnValue
         }
 
@@ -395,6 +410,16 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
             "\tprivate Long id = null;\n"
     }
 
+    val getIdMethodTemplate: String =
+        "\tpublic Long getId() {\n" +
+                "\t\treturn id;\n" +
+                "\t}"
+
+    val setIdMethodTemplate: String =
+        "\tpublic void setId(Long id) {\n" +
+                "\t\tthis.id = id;\n" +
+                "\t}"
+
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
         (if(fieldType == "Object") "\t@ManyToOne\n" else "\t@Column(nullable = false)\n\t") +
@@ -441,6 +466,8 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
                         (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
                             setMethodTemplate(it.key, it.value as String)
                         } +
+                        "\n" + getIdMethodTemplate +
+                        "\n" + setIdMethodTemplate +
                         dataClassFoot
 
             entity.key to returnValue

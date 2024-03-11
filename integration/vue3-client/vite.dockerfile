@@ -1,5 +1,4 @@
-FROM node:20-alpine
-COPY dev-entrypoint.sh .
+FROM node:20-bookworm-slim
 
 WORKDIR /usr/src/app
 
@@ -8,11 +7,10 @@ COPY vite.config.js .
 COPY .eslintrc.js .
 COPY babel.config.js .
 
-RUN ["npm", "install"]
+RUN ["npm", "install", "--legacy-peer-deps"]
 
 COPY index.html .
 COPY jsconfig.json .
-COPY dev-entrypoint.sh .
 
 #RUN npm install -g @vue/cli
 

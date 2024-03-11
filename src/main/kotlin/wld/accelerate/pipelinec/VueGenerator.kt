@@ -66,6 +66,7 @@ fun writeVueListComponentTemplate(entities: Map<String, Map<String, Any>>): Map<
 
     val scriptEntityList: (String) -> String = { "const ${it}List = ref([])\n" }
     val scriptHeadersHead = "const headers = ["
+    val scriptHeadersId = "{ title: 'id', key: 'id' },"
     val scriptHeadersFoot = "\n]\n"
     val scriptHeadersTemplate: (String) -> String = {field ->
         "\n\t\t\t{ title: '${field}', key: '${field}' }"
@@ -73,7 +74,7 @@ fun writeVueListComponentTemplate(entities: Map<String, Map<String, Any>>): Map<
 
     val onMounted: (String) -> String = {
         "\nonMounted(() => {\n" +
-                "  getData(\"https://localhost:8080/${String.unCapitalize(it)}/\").then(response => {\n" +
+                "  getData(\"http://localhost:8080/${String.unCapitalize(it)}/\").then(response => {\n" +
                 "    ${String.capitalize(it)}List.value = response\n" +
                 "  })\n" +
                 "})\n"
@@ -87,7 +88,11 @@ fun writeVueListComponentTemplate(entities: Map<String, Map<String, Any>>): Map<
             "      :items=\"${it}List\"\n" +
             "      class=\"elevation-1\"\n" +
             "      items-per-page=\"5\"\n" +
-            "  ></v-data-table>\n" +
+            "  >\n" +
+            "    <template v-slot:item.name=\"{ item }\">\n" +
+            "      <router-link :to=\"'' + item.id\">{{ item.name.toUpperCase() }}</router-link>\n" +
+            "    </template>\n" +
+            "  </v-data-table>\n" +
             "</template>" }
 
     return entities.entries.associate {entry ->
@@ -96,6 +101,7 @@ fun writeVueListComponentTemplate(entities: Map<String, Map<String, Any>>): Map<
                 scriptsImport +
                 scriptEntityList(entry.key) +
                 scriptHeadersHead +
+                scriptHeadersId +
                 entry.value.keys.joinToString { scriptHeadersTemplate(it) } +
                 scriptHeadersFoot +
                 onMounted(entry.key) +
@@ -130,9 +136,6 @@ fun writeVueLandingPageComponentTemplate(entities: List<String>): String {
                 "</template>"
 
     val templateTagTemplate: (String) -> String = {
-                    "      <v-list-item link=\"${String.unCapitalize(it)}:1\">\n" +
-                    "        ${it}:1\n" +
-                    "      </v-list-item>\n" +
                     "      <v-list-item link=\"${String.unCapitalize(it)}-list\">\n" +
                     "        ${it}-List\n" +
                     "      </v-list-item>\n" +
@@ -141,7 +144,7 @@ fun writeVueLandingPageComponentTemplate(entities: List<String>): String {
                     "      </v-list-item>\n"
     }
 
-    return scriptsTag + templateTagHead + "Hello" + templateTagFoot
+    return scriptsTag + templateTagHead + entities.joinToString(separator = ""){ templateTagTemplate(it) } + templateTagFoot
 }
 
 fun writeVueAppNavigation(entities: List<String>): String {
@@ -170,9 +173,6 @@ fun writeVueAppNavigation(entities: List<String>): String {
                 "</template>"
 
     val templateTagTemplate: (String) -> String = {
-        "      <v-list-item to=\"/${String.unCapitalize(it)}/1\" link=\"${String.unCapitalize(it)}:1\">\n" +
-                "        ${it}:1\n" +
-                "      </v-list-item>\n" +
                 "      <v-list-item to=\"/${String.unCapitalize(it)}/list\" link=\"${String.unCapitalize(it)}-list\">\n" +
                 "        ${it}-List\n" +
                 "      </v-list-item>\n" +

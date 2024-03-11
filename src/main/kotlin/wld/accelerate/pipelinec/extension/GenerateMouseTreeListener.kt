@@ -140,25 +140,8 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 }
                                 val yamlMap = parseYaml(file.absolutePath)
 
-                                val entitiesMap: MutableMap<String, Map<String, Any>> =
-                                    if(yamlMap?.containsKey("entities") == true) {
-                                        yamlMap["entities"] as MutableMap<String, Map<String, Any>>
-                                    }
-                                    else {
-                                        mutableMapOf<String, Map<String, Any>>()
-                                    }
-                                entitiesMap[entityName!!] = fields as Map<String, Any>
-
-                                var controllersMap: MutableMap<String, Map<String, Boolean>> = mutableMapOf()
-                                if(yamlMap?.containsKey("controllers") == true) {
-                                    Messages.showInfoMessage("Found another controller", "info")
-                                    (yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>).also { controllersMap = it }
-                                }
-
                                 file.writeText(
-                                    writePackagePath("wld.accelerate.pipelinec") + "\n" +
-                                        writeYamlEntities(entitiesMap) + "\n" +
-                                        writeYamlControllers(controllersMap)
+                                    getConfigFileString(fields, yamlMap as Map<*,*>)
                                 )
                             }
                         } else if("controllers" == userObject) {
@@ -181,25 +164,8 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 }
                                 val yamlMap = parseYaml(file.absolutePath)
 
-                                var controllersMap: MutableMap<String, Map<String, Boolean>> = mutableMapOf()
-                                    if(yamlMap?.containsKey("controllers") == true) {
-                                        Messages.showInfoMessage("Found another controller", "info")
-                                        (yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>).also { controllersMap = it }
-                                    }
-
-                                val entitiesMap: MutableMap<String, Map<String, Any>> =
-                                    if(yamlMap?.containsKey("entities") == true) {
-                                        yamlMap["entities"] as MutableMap<String, Map<String, Any>>
-                                    }
-                                    else {
-                                        mutableMapOf<String, Map<String, Any>>()
-                                    }
-                                controllersMap[entityName!!] = fields
-
                                 file.writeText(
-                                    writePackagePath("wld.accelerate.pipelinec") + "\n" +
-                                            writeYamlEntities(entitiesMap) + "\n" +
-                                            writeYamlControllers(controllersMap)
+                                    getConfigFileString(fields, yamlMap as Map<*,*>)
                                 )
                             }
                         } else if("enums" == userObject) {
@@ -223,28 +189,8 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 }
                                 val yamlMap = parseYaml(file.absolutePath)
 
-                                var controllersMap: MutableMap<String, Map<String, Boolean>> =
-                                if(yamlMap?.containsKey("controllers") == true) {
-                                    yamlMap["controllers"] as MutableMap<String, Map<String, Boolean>>
-                                } else mutableMapOf()
-
-                                val entitiesMap: MutableMap<String, Map<String, Any>> =
-                                    if(yamlMap?.containsKey("entities") == true) {
-                                        yamlMap["entities"] as MutableMap<String, Map<String, Any>>
-                                    } else mutableMapOf()
-
-                                var enumsMap: MutableMap<String, List<String>> =
-                                    if(yamlMap?.containsKey("enums") == true) {
-                                        yamlMap["enums"] as MutableMap<String, List<String>>
-                                    } else mutableMapOf()
-
-                                enumsMap[enumName] = fields[enumName]!!
-
                                 file.writeText(
-                                    writePackagePath("wld.accelerate.pipelinec") + "\n" +
-                                            writeYamlEnums(enumsMap) + "\n" +
-                                            writeYamlEntities(entitiesMap) + "\n" +
-                                            writeYamlControllers(controllersMap)
+                                    getConfigFileString(fields, yamlMap as Map<*,*>)
                                 )
                             }
                         }
@@ -253,6 +199,31 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
             }
         }
     }
+}
+
+fun getConfigFileString(fields: Map<*, *> ,yamlMap: Map<*, *>): String {
+    val controllersMap: MutableMap<String, Map<String, Boolean>> = mutableMapOf()
+        if(yamlMap?.containsKey("controllers") == true) {
+            controllersMap.putAll(yamlMap["controllers"] as Map<String, Map<String, Boolean>>)
+        }
+        controllersMap.putAll(fields as Map<String, Map<String, Boolean>>)
+
+    var entitiesMap: MutableMap<String, Map<String, Any>> = mutableMapOf()
+        if(yamlMap?.containsKey("entities") == true) {
+            entitiesMap.putAll(yamlMap["entities"] as Map<String, Map<String, Any>>)
+        }
+        entitiesMap.putAll(fields as Map<String, Map<String, Any>>)
+
+    var enumsMap: MutableMap<String, List<String>> = mutableMapOf()
+        if(yamlMap?.containsKey("enums") == true) {
+            enumsMap = yamlMap["enums"] as MutableMap<String, List<String>>
+        }
+        enumsMap.putAll(fields as Map<String, List<String>>)
+
+    return writePackagePath("wld.accelerate.pipelinec") + "\n" +
+            writeYamlEnums(enumsMap) + "\n" +
+            writeYamlEntities(entitiesMap) + "\n" +
+            writeYamlControllers(controllersMap)
 }
 
 enum class ENDPOINT {
