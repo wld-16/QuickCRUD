@@ -185,12 +185,19 @@ fun writeVueAppNavigation(entities: List<String>): String {
 }
 
 fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, String> {
-    val scriptTag: (String, Map<String, Any>) -> String = { entity, fields ->
+    val scriptTag: (String, Map<String, Any>, Map<String, Any>) -> String = { entity, fields, selectEntities ->
         "<script>\n" +
-                "import { reactive } from 'vue';\n" +
-                "import { postData } from \"@/composables/server\";\n" +
+                "import { reactive, onMounted${if (selectEntities.size > 0) ", ref" else ""}} from 'vue';\n" +
+                "import { postData${if (selectEntities.size > 0) ", getData" else ""} } from \"@/composables/server\";\n" +
                 "export default {\n" +
                 "  setup() {\n" +
+                selectEntities.entries.joinToString (separator = ""){
+                    if(it.value.toString() == "Object"){
+                        "    let all${String.capitalize(it.key)}Items = ref()\n"
+                    } else {
+                        "    let all${it.value}Items = ref()\n"
+                    }
+                } +
                 "    let ${entity}CreateForm = reactive({\n" +
                 fields.entries.joinToString(separator = ",\n") {
                     if (it.value == "String") {
@@ -204,12 +211,20 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                     }
                 } +
                 "    \n})\n" +
+                "   onMounted(() => {\n" +
+                selectEntities.entries.joinToString (separator = ""){
+                    "    getData(\"http://localhost:8080/${it.key}/\").then(response => {\n" +
+                            "        all${String.capitalize(it.key)}Items.value = response\n" +
+                            "    })\n"
+                } +
+                "})\n" +
                 "    function save() {\n" +
-                "      postData(\"https://localhost:8080/${String.unCapitalize(entity)}/\", ${entity}CreateForm)\n" +
+                "      postData(\"http://localhost:8080/${String.unCapitalize(entity)}/\", ${entity}CreateForm)\n" +
                 "    }\n" +
                 "\n" +
                 "    return {\n" +
                 "      ${entity}CreateForm,\n" +
+                selectEntities.keys.joinToString(separator = "") { "       all${String.capitalize(it)}Items,\n" } +
                 "      save\n" +
                 "    }\n" +
                 "  }\n" +
@@ -221,13 +236,25 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
         "        <v-text-field v-model=\"${it.first}CreateForm.${it.second}\" label=\"${it.second}\"></v-text-field>\n"
     }
 
-    val templateTag: (String, List<String>) -> String = { entity, fields ->
+    val selectFieldTag: (Triple<String, String, String>, Boolean) -> String = { entry, isObject ->
+        "        <v-select v-model=\"${entry.first}CreateForm.${entry.second}\" label=\"${entry.second}\" ${if (isObject) "item-title=\"name\" item-value=\"id\"" else ""} :items=\"all${String.capitalize(entry.third)}\"></v-select>\n"
+    }
+
+    val templateTag: (String, Map<String, Any>) -> String = { entity, fields ->
         "<template>\n" +
                 "  <v-form>\n" +
                 "    <v-row>\n" +
                 "      <v-col>\n" +
-                fields.joinToString(separator = ""){ field ->
-                    textFieldTag(entity to field)
+                fields.entries.joinToString(separator = ""){ fieldEntry ->
+                    if(fieldEntry.value.toString() == "String") {
+                        textFieldTag(entity to fieldEntry.key)
+                    } else if(fieldEntry.value.toString() == "Integer") {
+                        textFieldTag(entity to fieldEntry.key)
+                    } else if(fieldEntry.value.toString() == "Object") {
+                        selectFieldTag(Triple(entity, fieldEntry.key, String.capitalize(fieldEntry.key) + "Items"), true)
+                    } else {
+                        selectFieldTag(Triple(entity, fieldEntry.key, fieldEntry.value.toString() + "Items"), false)
+                    }
                 } +
                 "      </v-col>\n" +
                 "      <v-col>\n" +
@@ -238,10 +265,10 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                 "</template>"
     }
 
-    return entities.entries.associate {
-        it.key to scriptTag(it.key, it.value) +
+    return entities.entries.associate { classEntry ->
+        classEntry.key to scriptTag(classEntry.key, classEntry.value, classEntry.value.filter { it.value.toString() != "String" && it.value.toString() != "Integer" }) +
                 "\n" +
-            templateTag(it.key, it.value.keys.toList())
+            templateTag(classEntry.key, classEntry.value)
         }
 }
 
@@ -262,7 +289,7 @@ fun writeVueDetailsComponentTemplate(entities: Map<String, Map<String, Any>>): M
 
     val scriptsTagLifecycleHooks: (String) -> String = {
         "onMounted(() => {\n" +
-                "  getData(\"https://localhost:8080/${String.unCapitalize(it)}/\" + id).then(response => {\n" +
+                "  getData(\"http://localhost:8080/${String.unCapitalize(it)}/\" + id).then(response => {\n" +
                 "    ${it}Details.value = response\n" +
                 "  })\n" +
                 "})"
