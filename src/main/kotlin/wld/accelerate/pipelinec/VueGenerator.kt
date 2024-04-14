@@ -173,10 +173,10 @@ fun writeVueAppNavigation(entities: List<String>): String {
                 "</template>"
 
     val templateTagTemplate: (String) -> String = {
-                "      <v-list-item to=\"/${String.unCapitalize(it)}/list\" link=\"${String.unCapitalize(it)}-list\">\n" +
+                "      <v-list-item to=\"/${String.unCapitalize(it)}/list\">\n" +
                 "        ${it}-List\n" +
                 "      </v-list-item>\n" +
-                "      <v-list-item to=\"/${String.unCapitalize(it)}/create\" link=\"${String.unCapitalize(it)}-create\">\n" +
+                "      <v-list-item to=\"/${String.unCapitalize(it)}/create\">\n" +
                 "        ${it}-Create\n" +
                 "      </v-list-item>\n"
     }

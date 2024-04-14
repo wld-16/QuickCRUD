@@ -220,36 +220,36 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
     }
 
     val getIdMethodTemplate: String =
-        "public Long getId() {\n" +
+        "\tpublic Long getId() {\n" +
             "\t\treturn id;\n" +
             "\t}"
 
     val setIdMethodTemplate: String =
-        "public void setId(Long id) {\n" +
+        "\tpublic void setId(Long id) {\n" +
                 "\t\tthis.id = id;\n" +
                 "\t}"
 
-    val fromTemplate: (String, Map<Pair<String, Any>, String>) -> String = { it, map ->
+    val fromTemplate: (String, List<Triple<String, Any, String>>) -> String = { it, map ->
         "\tpublic static ${it}Model from$it($it ${String.unCapitalize(it)}) {\n" +
                 "\t\t${it}Model ${String.unCapitalize(it)}Model = new ${it}Model();\n" +
                 "\t\t${String.unCapitalize(it)}Model.id = ${String.unCapitalize(it)}.getId();\n" +
-                map.entries.joinToString(separator = "") { entry ->
-                    "\t\t${String.unCapitalize(it)}Model." + entry.value + " = " +
-                            (if(entry.key.second == "Object") String.capitalize(entry.value) + "Model.from" + String.capitalize(entry.value) + "(" else "") +
-                            "${String.unCapitalize(entry.key.first)}.get${String.capitalize(entry.value)}()" + (if(entry.key.second == "Object") ")" else "") +  ";\n" } +
+                map.joinToString(separator = "") { entry ->
+                    "\t\t${String.unCapitalize(it)}Model." + entry.third + " = " +
+                            (if(entry.second == "Object") String.capitalize(entry.third) + "Model.from" + String.capitalize(entry.third) + "(" else "") +
+                            "${String.unCapitalize(entry.first)}.get${String.capitalize(entry.third)}()" + (if(entry.second == "Object") ")" else "") +  ";\n" } +
                 "\t\treturn ${String.unCapitalize(it)}Model;\n" +
                 "\t}\n"
     }
 
-    val toModelTemplate: (String, Map<Pair<String, Any>, String>) -> String = { it, map ->
+    val toModelTemplate: (String, List<Triple<String, Any, String>>) -> String = { it, map ->
         "\tpublic static $it to$it(${it}Model ${String.unCapitalize(it)}Model){\n" +
                 "\t\t$it ${String.unCapitalize(it)} = new $it();\n" +
                 "\t\t${String.unCapitalize(it)}.setId(${String.unCapitalize(it)}Model.getId());\n" +
-                map.entries.joinToString(separator = "") {
-                    entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.value)}(" +
-                        (if(entry.key.second == "Object") String.capitalize(entry.value) + "Model.to" + String.capitalize(entry.value) + "(" else "") +
-                        "${"${String.unCapitalize(it)}Model.get${String.capitalize(entry.value)}()" }" +
-                        (if(entry.key.second == "Object") ")" else "") +
+                map.joinToString(separator = "") {
+                    entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.third)}(" +
+                        (if(entry.second == "Object") String.capitalize(entry.third) + "Model.to" + String.capitalize(entry.third) + "(" else "") +
+                        "${"${String.unCapitalize(it)}Model.get${String.capitalize(entry.third)}()" }" +
+                        (if(entry.second == "Object") ")" else "") +
                         ");\n" } +
                 "\t\treturn ${String.unCapitalize(it)};\n" +
                 "\t}"
@@ -275,9 +275,9 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
                     } + "\n" +
                     fromTemplate(
                         entityToFieldEntry.key,
-                        entityToFieldEntry.value.entries.associate { fieldEntry -> Pair(entityToFieldEntry.key, fieldEntry.value) to fieldEntry.key}) +
+                        entityToFieldEntry.value.entries.map { fieldEntry -> Triple(entityToFieldEntry.key, fieldEntry.value, fieldEntry.key)}) +
                     toModelTemplate(
-                        entityToFieldEntry.key, entityToFieldEntry.value.entries.associate { entry -> Pair(entityToFieldEntry.key, entry.value) to entry.key}) + "\n" +
+                        entityToFieldEntry.key, entityToFieldEntry.value.map { entry -> Triple(entityToFieldEntry.key, entry.value, entry.key)}) + "\n" +
                     (entityToFieldEntry.value as Map<String, *>).entries.joinToString(separator = "") {
                         getMethodTemplate(it.key, it.value as String)
                     } +
