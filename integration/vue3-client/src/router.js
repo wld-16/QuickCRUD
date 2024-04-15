@@ -27,6 +27,9 @@ import ContactDetails from "@/components/ContactDetails.vue";
 import ContactList from "@/components/ContactList.vue";
 import ContactCreateForm from "@/components/ContactCreateForm.vue";
 import LandingPage from "@/components/LandingPage.vue";
+import SpectrumList from "@/components/SpectrumList.vue";
+import SpectrumCreateForm from "@/components/SpectrumCreateForm.vue";
+import SpectrumDetails from "@/components/SpectrumDetails.vue";
 
 const routes = [
 	{
@@ -142,6 +145,18 @@ const routes = [
 		path: '/contact/create',
 		name: 'contact-create',
 		component: ContactCreateForm
+	}, {
+		path: '/spectrum/list',
+		name: 'spectrum-list',
+		component: SpectrumList
+	},{
+		path: '/spectrum/:id',
+		name: 'spectrum-details',
+		component: SpectrumDetails
+	},{
+		path: '/spectrum/create',
+		name: 'spectrum-create',
+		component: SpectrumCreateForm
 	}]
 const router = createRouter({
 	// 4. Provide the history implementation to use. We are using the hash history for simplicity here.

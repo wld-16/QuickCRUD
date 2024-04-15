@@ -13,6 +13,16 @@
           </set>
         </option>
       </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/integration/spring-boot-server" />
+        <option name="gradleJvm" value="temurin-19" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/integration/spring-boot-server" />
+            <option value="$PROJECT_DIR$/integration/spring-boot-server/Spring-Boot-Server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
     </option>
   </component>
 </project>
