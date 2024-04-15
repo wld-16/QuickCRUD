@@ -30,64 +30,64 @@
 
   <actions>
     <action
-            id="wld.accelerate.pipelinec.EnumGeneratorAction"
-            class="wld.accelerate.pipelinec.EnumGeneratorAction"
+            id="wld.accelerate.quickcrud.EnumGeneratorAction"
+            class="wld.accelerate.quickcrud.EnumGeneratorAction"
             text="Generate Enums"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Enums"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.EntityGeneratorAction"
-            class="wld.accelerate.pipelinec.EntityGeneratorAction"
+            id="wld.accelerate.quickcrud.EntityGeneratorAction"
+            class="wld.accelerate.quickcrud.EntityGeneratorAction"
             text="Generate Enums"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Entity Class"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.VueComponentListAction"
-            class="wld.accelerate.pipelinec.VueComponentListAction"
+            id="wld.accelerate.quickcrud.VueComponentListAction"
+            class="wld.accelerate.quickcrud.VueComponentListAction"
             text="Generate Vue List Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Vue List Component"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.VueComponentFormAction"
-            class="wld.accelerate.pipelinec.VueComponentFormAction"
+            id="wld.accelerate.quickcrud.VueComponentFormAction"
+            class="wld.accelerate.quickcrud.VueComponentFormAction"
             text="Generate Vue Form Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Vue Form Component"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.VueComponentDetailsAction"
-            class="wld.accelerate.pipelinec.VueComponentDetailsAction"
+            id="wld.accelerate.quickcrud.VueComponentDetailsAction"
+            class="wld.accelerate.quickcrud.VueComponentDetailsAction"
             text="Generate Vue Details Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Vue Details Component"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.VueGeneratorAction"
-            class="wld.accelerate.pipelinec.VueGeneratorAction"
+            id="wld.accelerate.quickcrud.VueGeneratorAction"
+            class="wld.accelerate.quickcrud.VueGeneratorAction"
             text="Generate All Vue Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate All Vue Components"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.DDLGeneratorAction"
-            class="wld.accelerate.pipelinec.DDLGeneratorAction"
+            id="wld.accelerate.quickcrud.DDLGeneratorAction"
+            class="wld.accelerate.quickcrud.DDLGeneratorAction"
             text="Generate SQL"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate DDL"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.pipelinec.FullApplicationGeneratorAction"
-            class="wld.accelerate.pipelinec.FullApplicationGeneratorAction"
+            id="wld.accelerate.quickcrud.FullApplicationGeneratorAction"
+            class="wld.accelerate.quickcrud.FullApplicationGeneratorAction"
             text="Generate Application"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Full Application"/>
@@ -95,6 +95,6 @@
     </action>
   </actions>
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="crud-pipeline" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" factoryClass="wld.accelerate.pipelinec.PipelineToolWindowFactory" anchor="right"></toolWindow>
+    <toolWindow id="crud-pipeline" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" factoryClass="wld.accelerate.quickcrud.PipelineToolWindowFactory" anchor="right"></toolWindow>
   </extensions>
 </idea-plugin>

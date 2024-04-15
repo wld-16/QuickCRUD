@@ -40,8 +40,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/src/test/kotlin/wld/accelerate/pipelinec/java/
-/src/test/kotlin/wld/accelerate/pipelinec/kotlin/
-/src/test/kotlin/wld/accelerate/pipelinec/sql/
-/src/test/kotlin/wld/accelerate/pipelinec/vue/
+/src/test/kotlin/wld/accelerate/quickcrud/java/
+/src/test/kotlin/wld/accelerate/quickcrud/kotlin/
+/src/test/kotlin/wld/accelerate/quickcrud/sql/
+/src/test/kotlin/wld/accelerate/quickcrud/vue/
 /src/test/vue3-client/src/components/

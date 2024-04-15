@@ -1,2 +1,2 @@
-rootProject.name = "rest-jpa-security"
+rootProject.name = "spring-boot-server"
 include("Spring-Boot-Server")
