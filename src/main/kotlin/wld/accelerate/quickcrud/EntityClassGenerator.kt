@@ -5,6 +5,35 @@ import wld.accelerate.quickcrud.extension.snakeCase
 import wld.accelerate.quickcrud.extension.unCapitalize
 import java.util.regex.Pattern
 
+fun writeDDLRelationships(entities: Map<String, Map<String, Any>>): Map<String, String> {
+    // If 1-n
+    val oneToNTemplate: (String, String) -> String = { entityName: String, fieldName: String ->
+        "alter table $entityName add $fieldName integer;\n" +
+        "alter table $entityName add constraint ${entityName}_${fieldName}_id_fk \n\tforeign key ($fieldName) references $fieldName;"}
+
+    // If n-m
+    val nToMTemplate: (String, String) -> String = { entityName: String, fieldName: String ->
+        """
+        create table ${entityName}_$fieldName
+        (
+            id       serial,
+            $entityName integer
+                constraint ${entityName}_${fieldName}_${entityName}_id_fk
+                    references $entityName,
+            $fieldName  integer
+                constraint ${entityName}_${fieldName}_${fieldName}_id_fk
+                    references $fieldName
+        );
+    """.trimIndent()}
+
+    return entities.entries.associate {
+        it.key to it.value.entries.joinToString("") { entry ->
+            if (entry.value.toString().contains("1n")) oneToNTemplate(it.key, entry.key)
+            else if(entry.value.toString().contains("nm")) nToMTemplate(it.key, entry.key)
+            else "" }
+    }
+}
+
 fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
     val sqlTableHead: (String) -> String = { "CREATE TABLE ${String.snakeCase(it)} (\n" }
     val sqlTableFieldTemplate: (String, String) -> String = { fieldName, fieldType ->
@@ -444,13 +473,30 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
                 "\t}"
 
 
-    val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
-        (if(fieldType == "Object") "\t@ManyToOne\n" else "\t@Column(nullable = false)\n\t") +
-                "${if(fieldType == "Object") String.capitalize(fieldName) else fieldType} $fieldName = " +
+
+    val fieldTemplate: (String, String, String) -> String = { entityName: String, fieldName: String, fieldType: String ->
+        // TODO: Figure out something better
+        val fieldNameSingular = fieldName.dropLast(1)
+        val entityNamePlural = entityName + "s"
+        (
+                when (fieldType) {
+                    "Object" -> "\t@ManyToOne\n"
+                    "List-nm" -> """@ManyToMany(mappedBy = "${entityName}_$fieldNameSingular")
+                @JoinTable(
+                        name="${entityName}_$fieldNameSingular",
+                        joinColumns = @JoinColumn(name = "$entityName"),
+                        inverseJoinColumns=@JoinColumn(name="$fieldNameSingular")
+                )"""
+                    "List-mn" -> "@ManyToMany(mappedBy = \"$entityNamePlural\")"
+                    else -> "\t@Column(nullable = false)\n\t"
+                }) +
+                "${if(fieldType == "Object") String.capitalize(fieldName) else fieldType.split("-")[0]} \t$fieldName = " +
                 when (fieldType) {
                     "String" -> "\"\";\n"
                     "Enum" -> "[];\n"
                     "Object" -> "null;\n"
+                    "List-mn" -> "new ArrayList();\n"
+                    "List-nm" -> "new ArrayList();\n"
                     else -> "null;\n"
                 }
     }
@@ -481,7 +527,7 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
                     enumImportTemplate(it.value as String)
                 } + "\n" + dataImportHead + dataClassHead(entity.key) + defaultIdTemplate(entity.key) +
                         (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
-                            fieldTemplate(it.key, it.value as String)
+                            fieldTemplate(entity.key, it.key, it.value as String)
                         } +
                         (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
                             getMethodTemplate(it.key, (it.value as String))

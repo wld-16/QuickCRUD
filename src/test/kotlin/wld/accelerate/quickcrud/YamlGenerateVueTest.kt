@@ -32,7 +32,7 @@ class YamlGenerateVueTest() {
         val entityClassRepresentations = writeVueDetailsComponentTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
         entityClassRepresentations.forEach {
-            File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/" + it.key + "Details" +".vue").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/vue/components/" + it.key + "Details" +".vue").writeText(it.value)
         }
     }
 
@@ -48,7 +48,7 @@ class YamlGenerateVueTest() {
         val entityClassRepresentations = writeVueListComponentTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
         entityClassRepresentations.forEach {
-            File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/" + it.key + "List" +".vue").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/vue/components/" + it.key + "List" +".vue").writeText(it.value)
         }
     }
 
@@ -64,7 +64,7 @@ class YamlGenerateVueTest() {
 
         val navigationComponent = writeVueAppNavigation((yamlMap?.get("entities") as Map<String, *>).keys.toList())
 
-        File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/RouteNavigationComponent.vue").writeText(navigationComponent)
+        File("src/test/kotlin/wld/accelerate/quickcrud/vue/components/RouteNavigationComponent.vue").writeText(navigationComponent)
     }
     @Test
     fun test_writeVueLandingPage() {
@@ -77,7 +77,7 @@ class YamlGenerateVueTest() {
 
         val landingPage = writeVueLandingPageComponentTemplate((yamlMap?.get("entities") as Map<String, *>).keys.toList())
 
-        File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/LandingPage.vue").writeText(landingPage)
+        File("src/test/kotlin/wld/accelerate/quickcrud/vue/components/LandingPage.vue").writeText(landingPage)
     }
 
     @Test
@@ -91,7 +91,7 @@ class YamlGenerateVueTest() {
 
         val routerPlugin = writeVueRouterJs(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
-        File("src/test/kotlin/wld/accelerate/pipelinec/vue/plugins/router.js").writeText(routerPlugin)
+        File("src/test/kotlin/wld/accelerate/quickcrud/vue/plugins/router.js").writeText(routerPlugin)
     }
 
     @Test
@@ -106,7 +106,7 @@ class YamlGenerateVueTest() {
         val entityClassRepresentations = writeVueCreateForm(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
         entityClassRepresentations.forEach {
-            File("src/test/kotlin/wld/accelerate/pipelinec/vue/components/" + it.key + "CreateForm" +".vue").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/vue/components/" + it.key + "CreateForm" +".vue").writeText(it.value)
         }
     }
 
@@ -114,20 +114,20 @@ class YamlGenerateVueTest() {
         @JvmStatic
         @BeforeClass
         fun test_createDirectories(): Unit {
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/entity/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/controller/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/model/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/repository/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/entity/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/controller/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/model/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/repository/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/sql/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/components/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/plugins/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/entity/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/controller/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/model/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/repository/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/entity/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/controller/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/model/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/repository/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/sql/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/vue/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/vue/components/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/vue/plugins/"))
         }
     }
 }

@@ -13,18 +13,23 @@ controllers:
 entities:
   Ship:
     name: String
+    containers: List
     loadCapacity: Integer
 
   Container:
     name: String
+    articles: List
     loadCapacity: Integer
 
   Port:
     name: String
+    containerCranes: List-1n
+    containers: List-1n
     numberOfContainerCranes: Integer
 
   ContainerCrane:
     name: String
+    container: Object
     hoistPower: Integer
 
   Product:
@@ -45,11 +50,14 @@ entities:
     description: String
     rating: Integer
     spectrum: Object
+    opportunity: Object
+    contacts: List-nm
 
   Spectrum:
     name: String
     leftEnd: String
     rightEnd: String
+
 
   Contact:
     forename: String
@@ -57,3 +65,4 @@ entities:
     email: String
     tel: String
     description: String
+    activities: List-mn

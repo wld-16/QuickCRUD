@@ -189,13 +189,16 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
         "<script>\n" +
                 "import { reactive, onMounted${if (selectEntities.size > 0) ", ref" else ""}} from 'vue';\n" +
                 "import { postData${if (selectEntities.size > 0) ", getData" else ""} } from \"@/composables/server\";\n" +
+                "import router from \"../plugins/router\";\n" +
                 "export default {\n" +
                 "  setup() {\n" +
                 selectEntities.entries.joinToString (separator = ""){
                     if(it.value.toString() == "Object"){
-                        "    let all${String.capitalize(it.key)}Items = ref()\n"
+                        "    let all${String.capitalize(it.key)} = ref()\n"
+                    } else if(it.value.toString().contains("List")) {
+                        "    let all${String.capitalize(it.key)} = ref()\n"
                     } else {
-                        "    let all${it.value}Items = ref()\n"
+                        "    let all${it.value} = ref()\n"
                     }
                 } +
                 "    let ${entity}CreateForm = reactive({\n" +
@@ -206,6 +209,8 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                         "      ${it.key}: 0"
                     } else if (it.value == "Boolean") {
                         "      ${it.key}: false"
+                    } else if (it.value.toString().contains("List")) {
+                        "      ${it.key}: []"
                     } else {
                         "      ${it.key}: undefined"
                     }
@@ -213,18 +218,24 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                 "    \n})\n" +
                 "   onMounted(() => {\n" +
                 selectEntities.entries.joinToString (separator = ""){
-                    "    getData(\"http://localhost:8080/${it.key}/\").then(response => {\n" +
-                            "        all${String.capitalize(it.key)}Items.value = response\n" +
-                            "    })\n"
+                    if(it.value.toString().contains("List")) {
+                        "    getData(\"http://localhost:8080/${it.key.dropLast(1)}/\").then(response => {\n"
+                    } else {
+                        "    getData(\"http://localhost:8080/${it.key}/\").then(response => {\n"
+                    } +
+                        "        all${String.capitalize(it.key)}.value = response\n" +
+                        "    })\n"
                 } +
                 "})\n" +
                 "    function save() {\n" +
-                "      postData(\"http://localhost:8080/${String.unCapitalize(entity)}/\", ${entity}CreateForm)\n" +
+                "      postData(\"http://localhost:8080/${String.unCapitalize(entity)}/\", ${entity}CreateForm).then(response => {\n" +
+                "        router.push(\"/${String.unCapitalize(entity)}/\"+response.id)\n" +
+                "      })\n" +
                 "    }\n" +
                 "\n" +
                 "    return {\n" +
                 "      ${entity}CreateForm,\n" +
-                selectEntities.keys.joinToString(separator = "") { "       all${String.capitalize(it)}Items,\n" } +
+                selectEntities.keys.joinToString(separator = "") { "       all${String.capitalize(it)},\n" } +
                 "      save\n" +
                 "    }\n" +
                 "  }\n" +
@@ -239,6 +250,9 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
     val selectFieldTag: (Triple<String, String, String>, Boolean) -> String = { entry, isObject ->
         "        <v-select v-model=\"${entry.first}CreateForm.${entry.second}\" label=\"${entry.second}\" ${if (isObject) "item-title=\"name\" return-object" else ""} :items=\"all${String.capitalize(entry.third)}\"></v-select>\n"
     }
+    val autocompleteFieldTag: (Triple<String, String, String>) -> String = { entry ->
+        "        <v-autocomplete v-model=\"${entry.first}CreateForm.${entry.second}\" multiple=\"true\" label=\"${entry.second}\" item-title=\"name\" return-object :items=\"all${String.capitalize(entry.third)}\"></v-autocomplete>\n"
+    }
 
     val templateTag: (String, Map<String, Any>) -> String = { entity, fields ->
         "<template>\n" +
@@ -251,9 +265,11 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                     } else if(fieldEntry.value.toString() == "Integer") {
                         textFieldTag(entity to fieldEntry.key)
                     } else if(fieldEntry.value.toString() == "Object") {
-                        selectFieldTag(Triple(entity, fieldEntry.key, String.capitalize(fieldEntry.key) + "Items"), true)
+                        selectFieldTag(Triple(entity, fieldEntry.key, String.capitalize(fieldEntry.key)), true)
+                    } else if(fieldEntry.value.toString().contains("List")) {
+                        autocompleteFieldTag(Triple(entity, fieldEntry.key, String.capitalize(fieldEntry.key)))
                     } else {
-                        selectFieldTag(Triple(entity, fieldEntry.key, fieldEntry.value.toString() + "Items"), false)
+                        selectFieldTag(Triple(entity, fieldEntry.key, fieldEntry.value.toString()), false)
                     }
                 } +
                 "      </v-col>\n" +
