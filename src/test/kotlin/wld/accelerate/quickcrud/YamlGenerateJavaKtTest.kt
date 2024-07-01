@@ -34,7 +34,7 @@ class YamlGenerateJavaKtTest() {
         val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
 
         enumClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/java/" + it.key +".java").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/java/" + it.key +".java").writeText(it.value)
         }
     }
 
@@ -51,7 +51,7 @@ class YamlGenerateJavaKtTest() {
 
         val enumControllerContent = writeJavaEnumControllerClass(linkedHashMap.keys.map { it.toString() }, yamlMap["packagePath"] as String)
 
-        File("src/test/kotlin/wld/accelerate/pipelinec/java/controller/EnumController.java").writeText(enumControllerContent)
+        File("src/test/kotlin/wld/accelerate/quickcrud/java/controller/EnumController.java").writeText(enumControllerContent)
 
     }
 
@@ -71,7 +71,7 @@ class YamlGenerateJavaKtTest() {
         val controllerClassRepresentations = writeJavaControllerClasses((yamlMap["entities"] as Map<String, *>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.controller")
 
         controllerClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/java/controller/" + it.key + "Controller.java").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/java/controller/" + it.key + "Controller.java").writeText(it.value)
         }
     }
     @Test
@@ -88,7 +88,7 @@ class YamlGenerateJavaKtTest() {
         val repositoryClassRepresentation = writeJavaRepositoryDataClass((yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.repository")
 
         repositoryClassRepresentation.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/java/repository/" + it.key + "Repository.java").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/java/repository/" + it.key + "Repository.java").writeText(it.value)
         }
     }
 
@@ -106,7 +106,7 @@ class YamlGenerateJavaKtTest() {
         val entityClassRepresentations = writeEntityDataClassJava(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
 
         entityClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/java/entity/" + it.key +".java").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/java/entity/" + it.key +".java").writeText(it.value)
         }
     }
 
@@ -124,7 +124,7 @@ class YamlGenerateJavaKtTest() {
         val modelClassRepresentations = writeJavaModelDataClass(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
 
         modelClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/java/model/" + it.key + "Model.java").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/java/model/" + it.key + "Model.java").writeText(it.value)
         }
     }
 
@@ -140,7 +140,7 @@ class YamlGenerateJavaKtTest() {
         val serviceClassRepresentations = writeJavaServiceClass(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
 
         serviceClassRepresentations.forEach {
-            File("src/test/kotlin/wld/accelerate/pipelinec/java/service/" + it.key + "Service.java").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/java/service/" + it.key + "Service.java").writeText(it.value)
         }
     }
 
@@ -154,10 +154,10 @@ class YamlGenerateJavaKtTest() {
         val yamlMap = parseYaml(file.absolutePath)
         val entityClassRepresentations = writeDDLRelationships(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
-        Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/sql/"))
+        Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/sql/"))
 
         entityClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/sql/" + it.key +"_relationship.sql").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/sql/" + it.key +"_relationship.sql").writeText(it.value)
         }
     }
 
@@ -178,10 +178,10 @@ class YamlGenerateJavaKtTest() {
         }
         val entityClassRepresentations = writeDDL(entitiesWithoutRelationship)
 
-        Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/sql/"))
+        Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/sql/"))
 
         entityClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/pipelinec/sql/" + it.key +".sql").writeText(it.value)
+            File("src/test/kotlin/wld/accelerate/quickcrud/sql/" + it.key +".sql").writeText(it.value)
         }
     }
 
@@ -189,20 +189,21 @@ class YamlGenerateJavaKtTest() {
         @JvmStatic
         @BeforeClass
         fun test_createDirectories(): Unit {
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/entity/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/controller/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/model/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/kotlin/repository/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/entity/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/controller/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/model/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/java/repository/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/sql/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/components/"))
-            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/pipelinec/vue/plugins/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/entity/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/controller/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/model/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/kotlin/repository/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/entity/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/controller/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/model/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/repository/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/java/service/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/sql/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/vue/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/vue/components/"))
+            Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/vue/plugins/"))
         }
     }
 }

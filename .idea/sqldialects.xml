@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Activity.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Article.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Contact.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Container.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/ContainerCrane.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Opportunity.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Port.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Product.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Ship.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/integration/spring-boot-server/src/res/sql/Spectrum.sql" dialect="PostgreSQL" />
+  </component>
+</project>

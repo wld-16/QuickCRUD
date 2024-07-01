@@ -8,21 +8,25 @@ import java.util.regex.Pattern
 fun writeDDLRelationships(entities: Map<String, Map<String, Any>>): Map<String, String> {
     // If 1-n
     val oneToNTemplate: (String, String) -> String = { entityName: String, fieldName: String ->
-        "alter table $entityName add $fieldName integer;\n" +
-        "alter table $entityName add constraint ${entityName}_${fieldName}_id_fk \n\tforeign key ($fieldName) references $fieldName;"}
+        val fieldNameWithoutList = fieldName.split("List")[0]
+        val uncapitalizedEntityName = String.unCapitalize(entityName)
+        "\nalter table $uncapitalizedEntityName add $fieldNameWithoutList integer;\n" +
+        "alter table $uncapitalizedEntityName add constraint ${uncapitalizedEntityName}_${fieldNameWithoutList}_id_fk \n\tforeign key ($fieldNameWithoutList) references $fieldNameWithoutList;"}
 
     // If n-m
     val nToMTemplate: (String, String) -> String = { entityName: String, fieldName: String ->
+        val fieldNameWithoutList = fieldName.split("List")[0]
+        val uncapitalizedEntityName = String.unCapitalize(entityName)
         """
-        create table ${entityName}_$fieldName
+        create table ${uncapitalizedEntityName}_$fieldNameWithoutList
         (
             id       serial,
-            $entityName integer
-                constraint ${entityName}_${fieldName}_${entityName}_id_fk
-                    references $entityName,
-            $fieldName  integer
-                constraint ${entityName}_${fieldName}_${fieldName}_id_fk
-                    references $fieldName
+            $uncapitalizedEntityName integer
+                constraint ${uncapitalizedEntityName}_${fieldNameWithoutList}_${uncapitalizedEntityName}_id_fk
+                    references $uncapitalizedEntityName,
+            $fieldNameWithoutList  integer
+                constraint ${uncapitalizedEntityName}_${fieldNameWithoutList}_${fieldNameWithoutList}_id_fk
+                    references $fieldNameWithoutList
         );
     """.trimIndent()}
 
@@ -31,7 +35,7 @@ fun writeDDLRelationships(entities: Map<String, Map<String, Any>>): Map<String, 
             if (entry.value.toString().contains("1n")) oneToNTemplate(it.key, entry.key)
             else if(entry.value.toString().contains("nm")) nToMTemplate(it.key, entry.key)
             else "" }
-    }
+    }.filter { it.value.isNotEmpty() }
 }
 
 fun writeDDL(entities: Map<String, Map<String, Any>>): Map<String, String> {
@@ -253,21 +257,32 @@ fun writeKotlinRepositoryDataClass(entities: List<String>, packagePath: String):
 
 fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packagePath: String): Map<String, String> {
     val enumImportTemplate: (String) -> String =
-        { if (it == "String" || it == "Integer" || it == "Object") "" else "\nimport $packagePath.java.$it;" }
+        { if (it == "String" || it == "Integer" || it == "Object" || it.contains("List")) "" else "\nimport $packagePath.java.$it;" }
     val defaultIdTemplate: String = "\tprivate Long id;\n"
-
-    val importStatements: (String) -> (String) = { "\nimport $packagePath.java.entity.$it;" }
+    val importStatements: (String) -> (String) = {
+        if(it.contains("List")) ""
+        else "\nimport $packagePath.java.entity.$it;"
+    }
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
-        "\tprivate ${if(fieldType == "Object") String.capitalize(fieldName)+"Model" else fieldType} $fieldName;"
+        "\tprivate ${
+            if(fieldType == "Object") String.capitalize(fieldName)+"Model" 
+            else if(fieldType.contains("List-")) "List<${String.capitalize(fieldName).split("List")[0]}Model>"
+            else fieldType} $fieldName;"
     }
 
     val getMethodTemplate: (String, String) -> String = { fieldName, fieldType ->
-        "\n\tpublic ${if(fieldType == "Object")String.capitalize(fieldName)+"Model" else fieldType} get${String.capitalize(fieldName)}(){\n\t\treturn $fieldName;\n\t}\n"
+        "\n\tpublic ${
+            if(fieldType == "Object")String.capitalize(fieldName)+"Model" 
+            else if(fieldType.contains("List")) "List<${String.capitalize(fieldName.split("List")[0])}Model>"
+            else fieldType} get${String.capitalize(fieldName)}(){\n\t\treturn $fieldName;\n\t}\n"
     }
 
     val setMethodTemplate: (String, String) -> String = { fieldName, fieldType ->
-        "\n\tpublic void set${String.capitalize(fieldName)}(${if(fieldType == "Object") String.capitalize(fieldName) + "Model" else fieldType} $fieldName) {" +
+        "\n\tpublic void set${String.capitalize(fieldName)}(${
+            if(fieldType == "Object") String.capitalize(fieldName) + "Model"
+            else if(fieldType.contains("List")) "List<${String.capitalize(fieldName.split("List")[0])}Model>"
+            else fieldType} $fieldName) {" +
                 "\n\t\tthis.$fieldName = $fieldName;\n\t}\n"
     }
 
@@ -287,8 +302,12 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
                 "\t\t${String.unCapitalize(it)}Model.id = ${String.unCapitalize(it)}.getId();\n" +
                 map.joinToString(separator = "") { entry ->
                     "\t\t${String.unCapitalize(it)}Model." + entry.third + " = " +
-                            (if(entry.second == "Object") String.capitalize(entry.third) + "Model.from" + String.capitalize(entry.third) + "(" else "") +
-                            "${String.unCapitalize(entry.first)}.get${String.capitalize(entry.third)}()" + (if(entry.second == "Object") ")" else "") +  ";\n" } +
+                            (if(entry.second == "Object") String.capitalize(entry.third) + "Model.from" + String.capitalize(entry.third) + "("
+                            else if(entry.second.toString().contains("List")) "${String.unCapitalize(entry.first)}.get${String.capitalize(entry.third)}().stream().map(${String.capitalize(entry.third).split("List")[0]}Model::from${String.capitalize(entry.third).split("List")[0]}).toList()"
+                            else "") +
+                            (if(entry.second == "Object") "${String.unCapitalize(entry.first)}.get${String.capitalize(entry.third)}())"
+                            else if(entry.second.toString().contains("List"))""
+                            else "${String.unCapitalize(entry.first)}.get${String.capitalize(entry.third)}()") +  ";\n" } +
                 "\t\treturn ${String.unCapitalize(it)}Model;\n" +
                 "\t}\n"
     }
@@ -299,10 +318,12 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
                 "\t\t${String.unCapitalize(it)}.setId(${String.unCapitalize(it)}Model.getId());\n" +
                 map.joinToString(separator = "") {
                     entry -> "\t\t${String.unCapitalize(it)}.set${String.capitalize(entry.third)}(" +
-                        (if(entry.second == "Object") String.capitalize(entry.third) + "Model.to" + String.capitalize(entry.third) + "(" else "") +
-                        "${"${String.unCapitalize(it)}Model.get${String.capitalize(entry.third)}()" }" +
-                        (if(entry.second == "Object") ")" else "") +
-                        ");\n" } +
+                        (if(entry.second == "Object") String.capitalize(entry.third) + "Model.to" + String.capitalize(entry.third) + "("
+                        else if(entry.second.toString().contains("List")) "${String.unCapitalize(entry.first)}Model.get${String.capitalize(entry.third)}().stream().map(${String.capitalize(entry.third).split("List")[0]}Model::to${String.capitalize(entry.third).split("List")[0]}).toList())"
+                        else "") +
+                        (if(entry.second == "Object") "${String.unCapitalize(entry.first)}Model.get${String.capitalize(entry.third)}()))"
+                        else if(entry.second.toString().contains("List"))""
+                        else "${String.unCapitalize(entry.first)}Model.get${String.capitalize(entry.third)}())") +  ";\n" } +
                 "\t\treturn ${String.unCapitalize(it)};\n" +
                 "\t}"
 
@@ -316,6 +337,7 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
     val classesAsStrings = entityToField
         .entries.associate { entityToFieldEntry ->
             val returnValue = dataPackageHead(packagePath) +
+                    "import java.util.List;\n" +
                     importStatements(entityToFieldEntry.key) +
                     (entityToFieldEntry.value as Map<String, *>).entries.joinToString(separator = "") {
                         enumImportTemplate(it.value as String)
@@ -453,8 +475,8 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
 
 // Function to generate a Java Entity Class
 fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePath: String): Map<String, String> {
-    val enumImportTemplate: (String) -> String =
-        { if (it == "String" || it == "Integer" || it == "Object") "" else "\nimport $packagePath.java.$it;" }
+    val importTemplate: (Pair<String, String>) -> String =
+        { if (it.second == "String" || it.second == "Integer" || it.second == "Object" || it.first.contains("List")) "" else "\nimport $packagePath.java.${it.second};" }
 
     val defaultIdTemplate: (String) -> String = { "\n\t@Id\n" +
             "\t@SequenceGenerator(name=\"${String.unCapitalize(it)}_id_seq\", sequenceName=\"${String.unCapitalize(it)}_id_seq\", allocationSize=1)\n" +
@@ -476,43 +498,51 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
 
     val fieldTemplate: (String, String, String) -> String = { entityName: String, fieldName: String, fieldType: String ->
         // TODO: Figure out something better
-        val fieldNameSingular = fieldName.dropLast(1)
-        val entityNamePlural = entityName + "s"
+        val fieldNameSingular = fieldName.split("List")[0]
+        val entityNamePlural = entityName + "List"
         (
                 when (fieldType) {
                     "Object" -> "\t@ManyToOne\n"
-                    "List-nm" -> """@ManyToMany(mappedBy = "${entityName}_$fieldNameSingular")
-                @JoinTable(
-                        name="${entityName}_$fieldNameSingular",
-                        joinColumns = @JoinColumn(name = "$entityName"),
-                        inverseJoinColumns=@JoinColumn(name="$fieldNameSingular")
-                )"""
-                    "List-mn" -> "@ManyToMany(mappedBy = \"$entityNamePlural\")"
-                    else -> "\t@Column(nullable = false)\n\t"
-                }) +
-                "${if(fieldType == "Object") String.capitalize(fieldName) else fieldType.split("-")[0]} \t$fieldName = " +
+                    "List-1n" -> "\t@OneToMany\n"
+                    "List-nm" -> """
+    @ManyToMany()
+    @JoinTable(
+        name="${entityName.lowercase()}_$fieldNameSingular",
+        joinColumns = @JoinColumn(name = "${entityName.lowercase()}"),
+        inverseJoinColumns=@JoinColumn(name="$fieldNameSingular")
+    )
+"""
+                    "List-mn" -> "@ManyToMany(mappedBy = \"${String.unCapitalize(entityNamePlural)}\")"
+                    else -> "\t@Column(nullable = false)\n"
+                }) + "\t" +
+                (if(fieldType == "Object") String.capitalize(fieldName) + " " + fieldName + " = "
+                else if(fieldType.contains("List-")) fieldType.split("-")[0] + "<${String.capitalize(fieldName.split("List")[0])}> " + fieldName + " = "
+                else "$fieldType $fieldName  = ") +
                 when (fieldType) {
                     "String" -> "\"\";\n"
                     "Enum" -> "[];\n"
                     "Object" -> "null;\n"
-                    "List-mn" -> "new ArrayList();\n"
-                    "List-nm" -> "new ArrayList();\n"
+                    "List-1n" -> "new ArrayList<>();\n"
+                    "List-mn" -> "new ArrayList<>();\n"
+                    "List-nm" -> "new ArrayList<>();\n"
                     else -> "null;\n"
                 }
     }
 
     val getMethodTemplate: (String, String) -> String = { fieldName, fieldType ->
-        "\n\tpublic ${if(fieldType == "Object") String.capitalize(fieldName) else fieldType} get${String.capitalize(fieldName)}(){\n\t\treturn $fieldName;\n\t}\n"
+        "\n\tpublic ${if(fieldType == "Object") String.capitalize(fieldName) else if(fieldType.contains("List-")) fieldType.split("-")[0] + "<${String.capitalize(fieldName.split("List")[0])}>" else fieldType} get${String.capitalize(fieldName)}(){\n\t\treturn $fieldName;\n\t}\n"
     }
 
     val setMethodTemplate: (String, String) -> String = { fieldName, fieldType ->
-        "\n\tpublic void set${String.capitalize(fieldName)}(${if(fieldType == "Object") String.capitalize(fieldName) else fieldType} $fieldName) {" +
+        "\n\tpublic void set${String.capitalize(fieldName)}(${if(fieldType == "Object") String.capitalize(fieldName) else if(fieldType.contains("List-")) fieldType.split("-")[0] + "<${String.capitalize(fieldName.split("List")[0])}>" else fieldType} $fieldName) {" +
                 "\n\t\tthis.$fieldName = $fieldName;\n\t}\n"
     }
 
     val dataImportHead = "" +
             "import java.io.Serializable;\n" +
-            "import jakarta.persistence.*;"
+            "import java.util.List;\n"+
+            "import java.util.ArrayList;\n"+
+            "import jakarta.persistence.*;\n"
 
     val dataPackageHead: (String) -> String = { "package $it.java.entity;\n\n" }
 
@@ -524,7 +554,7 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
         .entries.associate { entity ->
             val returnValue =
                 dataPackageHead(packagePath) + (entity.value as Map<String, *>).entries.joinToString(separator = "") {
-                    enumImportTemplate(it.value as String)
+                    importTemplate(Pair(it.key, it.value.toString()))
                 } + "\n" + dataImportHead + dataClassHead(entity.key) + defaultIdTemplate(entity.key) +
                         (entity.value as Map<String, *>).entries.joinToString(separator = "\n") {
                             fieldTemplate(entity.key, it.key, it.value as String)
