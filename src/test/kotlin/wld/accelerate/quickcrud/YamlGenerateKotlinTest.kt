@@ -33,8 +33,8 @@ class YamlGenerateKotlinTest() {
 
         val enumClassRepresentations = writeKotlinEnums(linkedHashMap, yamlMap["packagePath"] as String)
 
-        enumClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/quickcrud/kotlin/" + it.key +".kt").writeText(it.value)
+        enumClassRepresentations.forEach {
+            File("src/test/kotlin/wld/accelerate/quickcrud/kotlin/" + it.key + ".kt").writeText(it.value)
         }
     }
 
@@ -70,9 +70,12 @@ class YamlGenerateKotlinTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val entityClassRepresentations = writeKotlinRepositoryDataClass((yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(), (yamlMap["packagePath"] as String) + ".repository")
+        val entityClassRepresentations = writeKotlinRepositoryDataClass(
+            (yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(),
+            (yamlMap["packagePath"] as String) + ".repository"
+        )
 
-        entityClassRepresentations.forEach{
+        entityClassRepresentations.forEach {
             File("src/test/kotlin/wld/accelerate/quickcrud/kotlin/repository/" + it.key + "Repository.kt").writeText(it.value)
         }
     }
@@ -88,10 +91,13 @@ class YamlGenerateKotlinTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val entityClassRepresentations = writeEntityDataClass(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
+        val entityClassRepresentations = writeEntityDataClass(
+            yamlMap?.get("entities") as Map<String, Map<String, Any>>,
+            yamlMap["packagePath"] as String
+        )
 
-        entityClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/quickcrud/kotlin/entity/" + it.key +".kt").writeText(it.value)
+        entityClassRepresentations.forEach {
+            File("src/test/kotlin/wld/accelerate/quickcrud/kotlin/entity/" + it.key + ".kt").writeText(it.value)
         }
     }
 
@@ -107,27 +113,13 @@ class YamlGenerateKotlinTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val modelClassRepresentations = writeModelDataClass(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
+        val modelClassRepresentations = writeModelDataClass(
+            yamlMap?.get("entities") as Map<String, Map<String, Any>>,
+            yamlMap["packagePath"] as String
+        )
 
-        modelClassRepresentations.forEach{
+        modelClassRepresentations.forEach {
             File("src/test/kotlin/wld/accelerate/quickcrud/kotlin/model/" + it.key + "Model.kt").writeText(it.value)
-        }
-    }
-
-    @Test
-    fun test_writeSQLDDL() {
-        val resourceName = "sample/example.yaml"
-
-        val classLoader = javaClass.classLoader
-        val file = File(classLoader.getResource(resourceName)!!.file)
-
-        val yamlMap = parseYaml(file.absolutePath)
-        val entityClassRepresentations = writeDDL(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
-
-        Files.createDirectories(Path.of("src/test/kotlin/wld/accelerate/quickcrud/sql/"))
-
-        entityClassRepresentations.forEach{
-            File("src/test/kotlin/wld/accelerate/quickcrud/sql/" + it.key +".sql").writeText(it.value)
         }
     }
 
