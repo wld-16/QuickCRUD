@@ -49,7 +49,7 @@ class YamlGenerateJavaKtTest() {
 
         val linkedHashMap = yamlMap?.get("enums") as LinkedHashMap<String, String>
 
-        val enumControllerContent = writeJavaEnumControllerClass(linkedHashMap.keys.map { it.toString() }, yamlMap["packagePath"] as String)
+        val enumControllerContent = writeJavaEnumControllerClass(linkedHashMap.keys.map { it.toString() }, yamlMap["packagePath"] as String + ".java.controller")
 
         File("src/test/kotlin/wld/accelerate/quickcrud/java/controller/EnumController.java").writeText(enumControllerContent)
 
