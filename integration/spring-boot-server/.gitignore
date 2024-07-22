@@ -40,6 +40,5 @@ out/
 /src/main/java/wld/accelerate/quickcrud/java/entity/
 /src/main/java/wld/accelerate/quickcrud/java/repository/
 /src/main/java/wld/accelerate/quickcrud/java/service/
-/src/main/java/wld/accelerate/quickcrud/java/entity/
-/src/main/resources/sql/
-/src/main/resources/sql/executeSQL.sh
+/src/main/resources/db/executeSQL.sh
+/src/main/resources/db/sql/
