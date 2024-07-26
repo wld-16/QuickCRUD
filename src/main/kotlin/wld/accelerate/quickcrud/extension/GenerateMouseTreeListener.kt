@@ -21,14 +21,13 @@ import javax.swing.tree.TreePath
 fun generatingClassesMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): MouseAdapter {
     return object : MouseAdapter() {
         override fun mouseClicked(mouseEvent: MouseEvent) {
-            if (mouseEvent.clickCount === 2) { // Double-click
-                val path: TreePath = generateTree.getPathForLocation(mouseEvent.x, mouseEvent.y)
+            if (mouseEvent.clickCount == 2) { // Double-click
+                val path: TreePath? = generateTree.getPathForLocation(45, mouseEvent.y)
                 if (path != null) {
                     val lastPathComponent: Any = path.lastPathComponent
                     if (lastPathComponent is DefaultMutableTreeNode) {
                         val userObject = lastPathComponent.userObject
 
-                        //val file = File("src/main/resources/" + classLoader.getResource(resourceName)!!.file)
                         if ("generate" == userObject) {
 
                         } else {
@@ -115,7 +114,7 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
     return object : MouseAdapter() {
         override fun mouseClicked(mouseEvent: MouseEvent) {
             if (mouseEvent.clickCount === 2) { // Double-click
-                val path: TreePath = generateTree.getPathForLocation(mouseEvent.x, mouseEvent.y)
+                val path: TreePath = generateTree.getPathForLocation(45, mouseEvent.y)
                 if (path != null) {
                     val lastPathComponent: Any = path.lastPathComponent
                     if (lastPathComponent is DefaultMutableTreeNode) {
@@ -141,7 +140,7 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 val yamlMap = parseYaml(file.absolutePath)
 
                                 file.writeText(
-                                    getConfigFileString(fields, yamlMap as Map<*,*>)
+                                    getConfigFileString(mapOf(Pair(entityName, fields)), mapOf<String,Any>(), mapOf<String,Any>(), yamlMap as Map<*,*>)
                                 )
                             }
                         } else if("controllers" == userObject) {
@@ -165,7 +164,7 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 val yamlMap = parseYaml(file.absolutePath)
 
                                 file.writeText(
-                                    getConfigFileString(fields, yamlMap as Map<*,*>)
+                                    getConfigFileString(mapOf<String, Any>(), mapOf(Pair<String,Map<String, Any>>(entityName!!, fields)), mapOf<String, Any>(), yamlMap as Map<*,*>)
                                 )
                             }
                         } else if("enums" == userObject) {
@@ -190,7 +189,7 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 val yamlMap = parseYaml(file.absolutePath)
 
                                 file.writeText(
-                                    getConfigFileString(fields, yamlMap as Map<*,*>)
+                                    getConfigFileString(mapOf<String,Any>(), mapOf<String,Any>(), fields, yamlMap as Map<*,*>)
                                 )
                             }
                         }
@@ -201,26 +200,26 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
     }
 }
 
-fun getConfigFileString(fields: Map<*, *> ,yamlMap: Map<*, *>): String {
-    val controllersMap: MutableMap<String, Map<String, Boolean>> = mutableMapOf()
-        if(yamlMap?.containsKey("controllers") == true) {
-            controllersMap.putAll(yamlMap["controllers"] as Map<String, Map<String, Boolean>>)
+fun getConfigFileString(entityFields: Map<*, *>, controllerFields: Map<*, *>, enumFields: Map<*,*>, yamlMap: Map<*, *>): String {
+    val controllersMap: MutableMap<String, Map<String, Any>> = mutableMapOf()
+        if(yamlMap.containsKey("controllers") && yamlMap["controllers"] != null) {
+            controllersMap.putAll(yamlMap["controllers"] as Map<String, Map<String, Any>>)
         }
-        controllersMap.putAll(fields as Map<String, Map<String, Boolean>>)
+        controllersMap.putAll(controllerFields as Map<String, Map<String, Any>>)
 
     var entitiesMap: MutableMap<String, Map<String, Any>> = mutableMapOf()
-        if(yamlMap?.containsKey("entities") == true) {
+        if(yamlMap.containsKey("entities") && yamlMap["entities"] != null) {
             entitiesMap.putAll(yamlMap["entities"] as Map<String, Map<String, Any>>)
         }
-        entitiesMap.putAll(fields as Map<String, Map<String, Any>>)
+        entitiesMap.putAll(entityFields as Map<String, Map<String, Any>>)
 
     var enumsMap: MutableMap<String, List<String>> = mutableMapOf()
-        if(yamlMap?.containsKey("enums") == true) {
+        if(yamlMap.containsKey("enums") && yamlMap["enums"] != null){
             enumsMap = yamlMap["enums"] as MutableMap<String, List<String>>
         }
-        enumsMap.putAll(fields as Map<String, List<String>>)
+        enumsMap.putAll(enumFields as Map<String, List<String>>)
 
-    return writePackagePath("wld.accelerate.pipelinec") + "\n" +
+    return writePackagePath("wld.accelerate.quickcrud") + "\n" +
             writeYamlEnums(enumsMap) + "\n" +
             writeYamlEntities(entitiesMap) + "\n" +
             writeYamlControllers(controllersMap)

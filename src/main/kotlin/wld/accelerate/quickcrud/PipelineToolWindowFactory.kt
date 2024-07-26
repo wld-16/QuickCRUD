@@ -5,19 +5,13 @@ import com.intellij.openapi.roots.ui.componentsList.layout.VerticalStackLayout
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.treeStructure.Tree
 import wld.accelerate.quickcrud.extension.createConfigMouseTreeListener
 import wld.accelerate.quickcrud.extension.generatingClassesMouseTreeListener
-import java.util.*
-import javax.swing.ImageIcon
-import javax.swing.JLabel
 import javax.swing.tree.DefaultMutableTreeNode
-
-private const val CALENDAR_ICON_PATH = "/toolWindow/Calendar-icon.png"
-
-class BookInfo(s: String, s1: String)
 
 class PipelineToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
@@ -48,18 +42,20 @@ class PipelineToolWindowFactory : ToolWindowFactory {
             rootPanel.add(generatingTreePanel)
             rootPanel.add(configTreePanel)
 
-            //val boxLayoutContainer = Container()
-            //configTreePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0))
-
-            val createConfigNode = DefaultMutableTreeNode(JLabel("Create Config"), true)
-            //setIconForNode(createConfigNode, ImageIcon(AllIcons.Nodes.Package.printToString()))
+            val createConfigNode = DefaultMutableTreeNode("Config", true)
 
             createConfigNode.add(DefaultMutableTreeNode("enums"))
             createConfigNode.add(DefaultMutableTreeNode("controllers"))
             createConfigNode.add(DefaultMutableTreeNode("entities"))
 
+            val coloredTreeCellRenderer: ColoredTreeCellRenderer = CreateConfigColoredTreeCellRenderer()
+
+
+            val creatingConfigTree = Tree(createConfigNode)
+            creatingConfigTree.cellRenderer = coloredTreeCellRenderer
+
+
             val generateNode = DefaultMutableTreeNode("generate", true)
-            setIconForNode(generateNode, ImageIcon(javaClass.getResource(CALENDAR_ICON_PATH) ))
             generateNode.add(DefaultMutableTreeNode("sql"))
             generateNode.add(DefaultMutableTreeNode("entities"))
             generateNode.add(DefaultMutableTreeNode("controllers"))
@@ -68,8 +64,14 @@ class PipelineToolWindowFactory : ToolWindowFactory {
             generateNode.add(DefaultMutableTreeNode("vue-list"))
             generateNode.add(DefaultMutableTreeNode("vue-landing-page"))
 
-            val creatingConfigTree = Tree(createConfigNode)
+
+            val generateCodeColoredTreeCellRenderer: ColoredTreeCellRenderer = GenerateCodeColoredTreeCellRenderer()
+
             val generatingClassesTree = Tree(generateNode)
+            generatingClassesTree.cellRenderer = generateCodeColoredTreeCellRenderer
+
+
+
 
             creatingConfigTree.addMouseListener(createConfigMouseTreeListener(creatingConfigTree, toolWindow))
             generatingClassesTree.addMouseListener(generatingClassesMouseTreeListener(generatingClassesTree, toolWindow))
@@ -82,14 +84,5 @@ class PipelineToolWindowFactory : ToolWindowFactory {
             rootPanel.add(generatingTreePanel)
         }
 
-        private fun setIconLabel(label: JLabel, imagePath: String) {
-            label.setIcon(ImageIcon(Objects.requireNonNull(javaClass.getResource(imagePath))))
-        }
-
-        private companion object fun setIconForNode(node: DefaultMutableTreeNode, icon: ImageIcon) {
-            val text = node.userObject.toString()
-            node.userObject = icon
-
-        }
     }
 }
