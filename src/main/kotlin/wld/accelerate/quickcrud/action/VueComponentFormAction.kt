@@ -1,4 +1,4 @@
-package wld.accelerate.quickcrud
+package wld.accelerate.quickcrud.action
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -7,6 +7,8 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import org.jetbrains.annotations.NotNull
 import org.yaml.snakeyaml.Yaml
+import wld.accelerate.quickcrud.parseYaml
+import wld.accelerate.quickcrud.writeVueCreateForm
 import java.io.File
 
 
@@ -29,7 +31,7 @@ class VueComponentFormAction : AnAction() {
 
             val vueFormComponentRepresentation = writeVueCreateForm(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
 
-            val basePath = event.project!!.basePath + "/src/res/vue/"
+            val basePath = event.project!!.basePath + "/src/main/resources/vue/"
 
             vueFormComponentRepresentation.forEach { fileToContent ->
                 File(basePath + fileToContent.key + "List" +".vue").writeText(fileToContent.value)

@@ -1,4 +1,4 @@
-package wld.accelerate.quickcrud
+package wld.accelerate.quickcrud.action
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -7,6 +7,7 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import org.jetbrains.annotations.NotNull
 import org.yaml.snakeyaml.Yaml
+import wld.accelerate.quickcrud.*
 import java.io.File
 
 
@@ -38,7 +39,7 @@ class FullApplicationGeneratorAction : AnAction() {
 
             val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
             val entityClassRepresentations = writeEntityDataClassJava(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
-            val repositoryClassRepresentations = writeJavaRepositoryDataClass((yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.repository")
+            val repositoryClassRepresentations = writeJavaRepositoryDataClass((yamlMap?.get("entities") as Map<String, Map<String, Any>>).keys.toList(), (yamlMap["packagePath"] as String))
             val controllerClassRepresentations = writeJavaControllerClasses((yamlMap["entities"] as Map<String, *>).keys.toList(), (yamlMap["packagePath"] as String) + ".java.controller")
             val serviceClassRepresentations = writeJavaServiceClass(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
 

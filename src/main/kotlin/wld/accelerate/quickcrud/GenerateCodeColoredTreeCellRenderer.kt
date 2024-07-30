@@ -24,27 +24,47 @@ class GenerateCodeColoredTreeCellRenderer : ColoredTreeCellRenderer() {
             }
             2 -> {
                 this.icon = Icons.AddFileIcon
-                append("\tEntities\n")
+                append("\tEnums\n")
             }
             3 -> {
                 this.icon = Icons.AddFileIcon
-                append("\tControllers\n")
+                append("\tEntities\n")
             }
             4 -> {
                 this.icon = Icons.AddFileIcon
-                append("\tVUE-Create\n")
+                append("\tModels\n")
             }
             5 -> {
                 this.icon = Icons.AddFileIcon
-                append("\tVUE-Details\n")
+                append("\tControllers\n")
             }
             6 -> {
                 this.icon = Icons.AddFileIcon
-                append("\tVUE-List\n")
+                append("\tServices")
             }
             7 -> {
                 this.icon = Icons.AddFileIcon
+                append("\tRepositories")
+            }
+            8 -> {
+                this.icon = Icons.AddFileIcon
+                append("\tVUE-Create\n")
+            }
+            9 -> {
+                this.icon = Icons.AddFileIcon
+                append("\tVUE-Details\n")
+            }
+            10 -> {
+                this.icon = Icons.AddFileIcon
+                append("\tVUE-List\n")
+            }
+            11 -> {
+                this.icon = Icons.AddFileIcon
                 append("\tVUE-Landing-Page\n")
+            }
+            12 -> {
+                this.icon = Icons.AddFileIcon
+                append("\tAll\n")
             }
         }
     }

@@ -27,8 +27,8 @@ fun writeYamlEntities(map: Map<String, Map<String, Any>>): String {
 }
 
 fun writeYamlEnums(map: Map<String, List<String>>): String {
-    return "enums:" + map.asSequence().joinToString("") { enumEntry ->
-        "\n  " + enumEntry.key + ": [" + enumEntry.value.joinToString(",") + "]"
+    return "enums:" + "\"" + map.asSequence().joinToString("") { enumEntry ->
+        "\n  " + enumEntry.key + ": [" + enumEntry.value.joinToString(",") + "]\""
     }
 }
 

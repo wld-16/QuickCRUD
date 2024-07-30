@@ -5,8 +5,8 @@ import wld.accelerate.quickcrud.extension.snakeCase
 import wld.accelerate.quickcrud.extension.unCapitalize
 import java.util.regex.Pattern
 
-fun writeJavaEnums(enums: LinkedHashMap<String, String>, packagePath: String): Map<String, String> {
-    val head: (String) -> String = { "package $packagePath.java;\n\npublic enum $it {" }
+fun writeJavaEnums(enums: Map<String, String>, packagePath: String): Map<String, String> {
+    val head: (String) -> String = { "package $packagePath;\n\npublic enum ${String.capitalize(it)} {" }
     val entry: (String) -> String = { "\n\t$it," }
     val foot: String = "\n}"
 
@@ -22,7 +22,7 @@ fun writeJavaEnums(enums: LinkedHashMap<String, String>, packagePath: String): M
 }
 
 fun writeKotlinEnums(enums: LinkedHashMap<String, String>, packagePath: String): Map<String, String> {
-    val head: (String) -> String = { "package $packagePath.kotlin\n\nenum class $it {" }
+    val head: (String) -> String = { "package $packagePath\n\nenum class $it {" }
     val entry: (String) -> String = { "\n\t$it," }
     val foot: String = "\n}"
 
@@ -36,13 +36,13 @@ fun writeKotlinEnums(enums: LinkedHashMap<String, String>, packagePath: String):
 }
 
 fun writeJavaEnumControllerClass(enums: List<String>, packagePath: String): String {
-    val packageStatement: String = "package $packagePath;\n"
+    val packageStatement: String = "package $packagePath.controller;\n"
     val importStatements =
         "import org.springframework.http.ResponseEntity;\n" +
         "import org.springframework.web.bind.annotation.GetMapping;\n" +
         "import org.springframework.web.bind.annotation.RestController;\n" +
         enums.joinToString(separator = "\n") {
-            "import wld.accelerate.quickcrud.java.$it;"
+            "import $packagePath.${String.capitalize(it)};"
         }
     val classStatement ="\n@RestController\n" +
                 "public class EnumController {\n"
@@ -59,15 +59,15 @@ fun writeJavaEnumControllerClass(enums: List<String>, packagePath: String): Stri
 }
 
 fun writeJavaControllerClasses(controllerEntities: List<String>, packagePath: String): Map<String, String> {
-    val packageStatement: String = "package $packagePath;\n"
+    val packageStatement: String = "package $packagePath.controller;\n"
 
     val importStatements: (String) -> String = {
                 "import org.springframework.beans.factory.annotation.Autowired;\n" +
                 "import org.springframework.http.ResponseEntity;\n" +
                 "import org.springframework.web.bind.annotation.*;;\n" +
-                "import wld.accelerate.quickcrud.java.entity.${it};\n" +
-                "import wld.accelerate.quickcrud.java.model.${it}Model;\n" +
-                "import wld.accelerate.quickcrud.java.service.${it}Service;\n" +
+                "import $packagePath.entity.${it};\n" +
+                "import $packagePath.model.${it}Model;\n" +
+                "import $packagePath.service.${it}Service;\n" +
                 "import java.util.List;"
     }
 
@@ -130,7 +130,7 @@ fun writeKotlinControllerClasses(controllerEntities: List<String>, packagePath: 
     val importPath: (String) -> String = {
         "import org.springframework.data.jpa.repository.JpaRepository\n" +
                 "import org.springframework.stereotype.Repository\n" +
-                "import wld.accelerate.quickcrud.$it"
+                "import $packagePath.controller.$it"
     }
 
     val interfaceString: (String) -> String = {
@@ -149,7 +149,7 @@ fun writeJavaRepositoryDataClass(entities: List<String>, packagePath: String): M
     val importPath: (String) -> String = {
         "import org.springframework.data.jpa.repository.JpaRepository;\n" +
                 "import org.springframework.stereotype.Repository;\n" +
-                "import wld.accelerate.quickcrud.java.entity.$it;"
+                "import $packagePath.entity.$it;"
     }
 
     val interfaceString: (String) -> String = {
@@ -157,14 +157,14 @@ fun writeJavaRepositoryDataClass(entities: List<String>, packagePath: String): M
                 "public interface ${it}Repository extends JpaRepository<${it}, Integer> {\n" +
                 "}"
     }
-    return entities.associateWith { "package " + packagePath + ";" + "\n\n" + importPath(it) + "\n\n" + interfaceString(it) }
+    return entities.associateWith { "package " + packagePath + ".repository" + ";" + "\n\n" + importPath(it) + "\n\n" + interfaceString(it) }
 }
 
 fun writeKotlinRepositoryDataClass(entities: List<String>, packagePath: String): Map<String, String> {
     val importPath: (String) -> String = {
         "import org.springframework.data.jpa.repository.JpaRepository\n" +
                 "import org.springframework.stereotype.Repository\n" +
-                "import wld.accelerate.quickcrud.kotlin.entity.$it"
+                "import $packagePath.entity.$it"
     }
 
     val interfaceString: (String) -> String = {
@@ -177,11 +177,11 @@ fun writeKotlinRepositoryDataClass(entities: List<String>, packagePath: String):
 
 fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packagePath: String): Map<String, String> {
     val enumImportTemplate: (String) -> String =
-        { if (it == "String" || it == "Integer" || it == "Object" || it.contains("List")) "" else "\nimport $packagePath.java.$it;" }
+        { if (it == "String" || it == "Integer" || it == "Object" || it.contains("List")) "" else "\nimport $packagePath.$it;" }
     val defaultIdTemplate: String = "\tprivate Long id;\n"
     val importStatements: (String) -> (String) = {
         if(it.contains("List")) ""
-        else "\nimport $packagePath.java.entity.$it;"
+        else "\nimport $packagePath.entity.$it;"
     }
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
@@ -249,7 +249,7 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
 
     }
 
-    val dataPackageHead: (String) -> String = { "package $it.java.model;\n" }
+    val dataPackageHead: (String) -> String = { "package $it.model;\n" }
 
     val dataClassHead: (String) -> String = { "\n\npublic class ${it}Model {\n" }
     val dataClassFoot = "\n}"
@@ -289,7 +289,7 @@ fun writeJavaModelDataClass(entityToField: Map<String, Map<String, Any>>, packag
 
 fun writeModelDataClass(models: Map<String, Map<String, Any>>, packagePath: String): Map<String, String> {
     val enumImportTemplate: (String) -> String =
-        { if (it == "String" || it == "Integer") "" else "\nimport $packagePath.kotlin.$it" }
+        { if (it == "String" || it == "Integer") "" else "\nimport $packagePath.$it" }
 
     val fieldTemplate: (String, String) -> String = { fieldName: String, fieldType: String ->
         var returningFieldType = fieldType
@@ -301,7 +301,7 @@ fun writeModelDataClass(models: Map<String, Map<String, Any>>, packagePath: Stri
         "\tval $fieldName: $returningFieldType,"
     }
 
-    val dataPackageHead: (String) -> String = { "package $it.kotlin.model\n" }
+    val dataPackageHead: (String) -> String = { "package $it.model\n" }
 
     val dataClassHead: (String) -> String = { "\n\ndata class $it (\n" }
     val dataClassFoot = "\n)"
@@ -327,9 +327,9 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
     val importStatements: (String) -> String = {
         "import org.springframework.beans.factory.annotation.Autowired;\n" +
         "import org.springframework.stereotype.Service;\n" +
-        "import wld.accelerate.quickcrud.java.entity.$it;\n" +
-        "import wld.accelerate.quickcrud.java.model.${it}Model;\n" +
-        "import wld.accelerate.quickcrud.java.repository.${it}Repository;\n" +
+        "import $packagePath.entity.$it;\n" +
+        "import $packagePath.model.${it}Model;\n" +
+        "import $packagePath.repository.${it}Repository;\n" +
         "import java.util.List;"
     }
 
@@ -344,7 +344,7 @@ fun writeJavaServiceClass(entities: Map<String, Map<String, Any>>, packagePath: 
         "\n"
     }
 
-    val packageStatement = "package $packagePath.java.service;\n"
+    val packageStatement = "package $packagePath.service;\n"
 
     val findByIdMethodTemplate: (String) -> String = {
         "\tpublic $it findById(Integer id) {\n" +
@@ -464,7 +464,7 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
             "import java.util.ArrayList;\n"+
             "import jakarta.persistence.*;\n"
 
-    val dataPackageHead: (String) -> String = { "package $it.java.entity;\n\n" }
+    val dataPackageHead: (String) -> String = { "package $it.entity;\n\n" }
 
     val dataClassHead: (String) -> String = { "\n@Entity\n" +
             "public class $it implements Serializable {" }
@@ -497,7 +497,7 @@ fun writeEntityDataClassJava(entities: Map<String, Map<String, Any>>, packagePat
 
 fun writeEntityDataClass(entities: Map<String, Map<String, Any>>, packagePath: String): Map<String, String> {
     val enumImportTemplate: (String) -> String =
-        { if (it == "String" || it == "Integer" || it == "Object") "" else "\nimport $packagePath.kotlin.$it" }
+        { if (it == "String" || it == "Integer" || it == "Object") "" else "\nimport $packagePath.$it" }
 
     val defaultIdTemplate: (String) -> String = {
         "\t@Id\n" +
@@ -519,7 +519,7 @@ fun writeEntityDataClass(entities: Map<String, Map<String, Any>>, packagePath: S
             "import java.io.Serializable\n\n" +
             "import jakarta.persistence.*\n"
 
-    val dataPackageHead: (String) -> String = { "package $it.kotlin.entity\n\n" }
+    val dataPackageHead: (String) -> String = { "package $it.entity\n\n" }
 
     val dataClassHead: (String) -> String = { "\n@Entity\nclass $it : Serializable {\n" }
     val dataClassFoot = "\n}"

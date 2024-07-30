@@ -17,12 +17,12 @@ class GenerateYamlTest {
 
     @Test
     fun test_writeYamlEnums() {
-        val entitiesMap: Map<String, List<String>> = mapOf(
+        val enumsMap: Map<String, List<String>> = mapOf(
             "testEntity" to listOf("asd, qwe, yxc"),
             "testa" to listOf("der, die, das"),
         )
-        val resultString = "enums:" + "\n  testEntity: [asd, qwe, yxc]\n  testa: [der, die, das]"
-        assertEquals(resultString, writeYamlEnums(entitiesMap))
+        val resultString = "enums:" + "\n  testEntity: \"[asd, qwe, yxc]\"\n  testa: \"[der, die, das]\""
+        assertEquals(resultString, writeYamlEnums(enumsMap))
     }
 
     @Test
@@ -35,7 +35,7 @@ class GenerateYamlTest {
                     ENDPOINT.UPDATE.name to true,
                     ENDPOINT.DELETE.name to false))
         val joinToString = writeYamlControllers(controllersMap)
-        val resultString = "controllers:" + "\n  testEntity:\n    CREATE: true\n    READ: true\n    READ_ALL: false\n    UPDATE: true\n    DELETE: false"
+        val resultString = "\ncontrollers:" + "\n  testEntity:\n    CREATE: true\n    READ: true\n    READ_ALL: false\n    UPDATE: true\n    DELETE: false"
         assertEquals(resultString, joinToString)
     }
 }

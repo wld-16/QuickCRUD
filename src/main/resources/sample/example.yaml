@@ -1,7 +1,7 @@
 packagePath: wld.accelerate.quickcrud
 enums:
-  Probability: "[TEN_PERCENT, THIRTY_PERCENT, FIFTY_PERCENT, HUNDRED_PERCENT]"
-  Status: "[WON, LOST, OPEN]"
+  Probability: [TEN_PERCENT, THIRTY_PERCENT, FIFTY_PERCENT, HUNDRED_PERCENT]
+  Status: [WON, LOST, OPEN]
 controllers:
   Product:
     CREATE: true

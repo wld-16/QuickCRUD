@@ -9,6 +9,7 @@ import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.treeStructure.Tree
+import wld.accelerate.quickcrud.action.*
 import wld.accelerate.quickcrud.extension.createConfigMouseTreeListener
 import wld.accelerate.quickcrud.extension.generatingClassesMouseTreeListener
 import javax.swing.tree.DefaultMutableTreeNode
@@ -29,7 +30,6 @@ class PipelineToolWindowFactory : ToolWindowFactory {
 
         init {
             listOf(
-                DDLGeneratorAction(),
                 EntityGeneratorAction(),
                 EnumGeneratorAction(),
                 FullApplicationGeneratorAction(),
@@ -57,12 +57,17 @@ class PipelineToolWindowFactory : ToolWindowFactory {
 
             val generateNode = DefaultMutableTreeNode("generate", true)
             generateNode.add(DefaultMutableTreeNode("sql"))
+            generateNode.add(DefaultMutableTreeNode("enums"))
             generateNode.add(DefaultMutableTreeNode("entities"))
+            generateNode.add(DefaultMutableTreeNode("models"))
             generateNode.add(DefaultMutableTreeNode("controllers"))
+            generateNode.add(DefaultMutableTreeNode("services"))
+            generateNode.add(DefaultMutableTreeNode("repositories"))
             generateNode.add(DefaultMutableTreeNode("vue-create"))
             generateNode.add(DefaultMutableTreeNode("vue-details"))
             generateNode.add(DefaultMutableTreeNode("vue-list"))
             generateNode.add(DefaultMutableTreeNode("vue-landing-page"))
+            generateNode.add(DefaultMutableTreeNode("all"))
 
 
             val generateCodeColoredTreeCellRenderer: ColoredTreeCellRenderer = GenerateCodeColoredTreeCellRenderer()

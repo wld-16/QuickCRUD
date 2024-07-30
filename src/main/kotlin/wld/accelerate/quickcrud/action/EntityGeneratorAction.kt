@@ -1,4 +1,4 @@
-package wld.accelerate.quickcrud
+package wld.accelerate.quickcrud.action
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -7,10 +7,13 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import org.jetbrains.annotations.NotNull
 import org.yaml.snakeyaml.Yaml
+import wld.accelerate.quickcrud.parseYaml
+import wld.accelerate.quickcrud.writeEntityDataClassJava
+import wld.accelerate.quickcrud.writeJavaEnums
 import java.io.File
 
 
-class DDLGeneratorAction : AnAction() {
+class EntityGeneratorAction : AnAction() {
     override fun update(@NotNull event: AnActionEvent) {
         // Using the event, evaluate the context,
         // and enable or disable the action.
@@ -31,11 +34,18 @@ class DDLGeneratorAction : AnAction() {
             val linkedHashMap = yamlMap?.get("enums") as LinkedHashMap<String, String>
 
             val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
+            val entityClassRepresentations = writeEntityDataClassJava(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)
 
+            val basePath = event.project!!.basePath + "/src/"
             enumClassRepresentations.forEach { fileEntry ->
-                File(event.project!!.basePath + "/src/res/ddl/" + fileEntry.key + ".java").writeText(fileEntry.value)
+                File(basePath  + fileEntry.key + ".java").writeText(fileEntry.value)
+            }
+
+            entityClassRepresentations.forEach{ fileEntry ->
+                File(basePath + ENTITY_PATH + fileEntry.key +".java").writeText(fileEntry.value)
             }
         }
+
 
         // Using the event, implement an action.
         // For example, create and show a dialog.

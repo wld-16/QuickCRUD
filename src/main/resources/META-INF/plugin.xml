@@ -30,64 +30,64 @@
 
   <actions>
     <action
-            id="wld.accelerate.quickcrud.EnumGeneratorAction"
-            class="wld.accelerate.quickcrud.EnumGeneratorAction"
+            id="wld.accelerate.quickcrud.action.EnumGeneratorAction"
+            class="wld.accelerate.quickcrud.action.EnumGeneratorAction"
             text="Generate Enums"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Enums"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.EntityGeneratorAction"
-            class="wld.accelerate.quickcrud.EntityGeneratorAction"
+            id="wld.accelerate.quickcrud.action.EntityGeneratorAction"
+            class="wld.accelerate.quickcrud.action.EntityGeneratorAction"
             text="Generate Enums"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Entity Class"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.VueComponentListAction"
-            class="wld.accelerate.quickcrud.VueComponentListAction"
+            id="wld.accelerate.quickcrud.action.VueComponentListAction"
+            class="wld.accelerate.quickcrud.action.VueComponentListAction"
             text="Generate Vue List Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Vue List Component"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.VueComponentFormAction"
-            class="wld.accelerate.quickcrud.VueComponentFormAction"
+            id="wld.accelerate.quickcrud.action.VueComponentFormAction"
+            class="wld.accelerate.quickcrud.action.VueComponentFormAction"
             text="Generate Vue Form Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Vue Form Component"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.VueComponentDetailsAction"
-            class="wld.accelerate.quickcrud.VueComponentDetailsAction"
+            id="wld.accelerate.quickcrud.action.VueComponentDetailsAction"
+            class="wld.accelerate.quickcrud.action.VueComponentDetailsAction"
             text="Generate Vue Details Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Vue Details Component"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.VueGeneratorAction"
-            class="wld.accelerate.quickcrud.VueGeneratorAction"
+            id="wld.accelerate.quickcrud.action.VueGeneratorAction"
+            class="wld.accelerate.quickcrud.action.VueGeneratorAction"
             text="Generate All Vue Components"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate All Vue Components"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.DDLGeneratorAction"
-            class="wld.accelerate.quickcrud.DDLGeneratorAction"
+            id="wld.accelerate.quickcrud.action.DDLGeneratorAction"
+            class="wld.accelerate.quickcrud.action.DDLGeneratorAction"
             text="Generate SQL"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate DDL"/>
       <add-to-group group-id="ToolsMenu" anchor="first"/>
     </action>
     <action
-            id="wld.accelerate.quickcrud.FullApplicationGeneratorAction"
-            class="wld.accelerate.quickcrud.FullApplicationGeneratorAction"
+            id="wld.accelerate.quickcrud.action.FullApplicationGeneratorAction"
+            class="wld.accelerate.quickcrud.action.FullApplicationGeneratorAction"
             text="Generate Application"
             description="SDK action example">
       <override-text place="MainMenu" text="Generate Full Application"/>
@@ -95,6 +95,6 @@
     </action>
   </actions>
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="crud-pipeline" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" factoryClass="wld.accelerate.quickcrud.PipelineToolWindowFactory" anchor="right"></toolWindow>
+    <toolWindow id="quick-crud" secondary="true" icon="/icons/pipelineIcon.svg" factoryClass="wld.accelerate.quickcrud.PipelineToolWindowFactory" anchor="right"></toolWindow>
   </extensions>
 </idea-plugin>

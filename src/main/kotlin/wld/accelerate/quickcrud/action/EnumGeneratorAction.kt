@@ -1,4 +1,4 @@
-package wld.accelerate.quickcrud
+package wld.accelerate.quickcrud.action
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -7,10 +7,12 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import org.jetbrains.annotations.NotNull
 import org.yaml.snakeyaml.Yaml
+import wld.accelerate.quickcrud.parseYaml
+import wld.accelerate.quickcrud.writeJavaEnums
 import java.io.File
 
 
-class VueComponentListAction : AnAction() {
+class EnumGeneratorAction : AnAction() {
     override fun update(@NotNull event: AnActionEvent) {
         // Using the event, evaluate the context,
         // and enable or disable the action.
@@ -25,14 +27,15 @@ class VueComponentListAction : AnAction() {
     override fun actionPerformed(@NotNull event: AnActionEvent) {
         FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFileDescriptor(), event.project, null) {
             val file = it.canonicalFile
+
             val yamlMap = parseYaml(file!!.path)
 
-            val vueListComponentRepresentation = writeVueListComponentTemplate(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
+            val linkedHashMap = yamlMap?.get("enums") as LinkedHashMap<String, String>
 
-            val basePath = event.project!!.basePath + "/src/res/vue/"
+            val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
 
-            vueListComponentRepresentation.forEach { fileToContent ->
-                File(basePath + fileToContent.key + "List" +".vue").writeText(fileToContent.value)
+            enumClassRepresentations.forEach { fileEntry ->
+               File(event.project!!.basePath + "/src/main/" + fileEntry.key + ".java").writeText(fileEntry.value)
             }
         }
 
