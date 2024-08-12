@@ -35,7 +35,7 @@ class FullApplicationGeneratorAction : AnAction() {
 
             val yamlMap = parseYaml(file!!.path)
 
-            val linkedHashMap = yamlMap?.get("enums") as LinkedHashMap<String, String>
+            val linkedHashMap = yamlMap["enums"] as LinkedHashMap<String, List<String>>
 
             val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
             val entityClassRepresentations = writeEntityDataClassJava(yamlMap?.get("entities") as Map<String, Map<String, Any>>, yamlMap["packagePath"] as String)

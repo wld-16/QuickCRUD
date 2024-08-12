@@ -89,7 +89,7 @@ class YamlGenerateVueTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val routerPlugin = writeVueRouterJs(yamlMap?.get("entities") as Map<String, Map<String, Any>>)
+        val routerPlugin = writeVueRouterJs(yamlMap["entities"] as Map<String, Map<String, Any>>)
 
         File("src/test/kotlin/wld/accelerate/quickcrud/vue/plugins/router.js").writeText(routerPlugin)
     }

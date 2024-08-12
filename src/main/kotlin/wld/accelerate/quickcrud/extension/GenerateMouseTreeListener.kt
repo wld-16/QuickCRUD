@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.treeStructure.Tree
 import kotlinx.collections.immutable.toPersistentHashMap
+import org.yaml.snakeyaml.error.YAMLException
 import wld.accelerate.quickcrud.*
 import wld.accelerate.quickcrud.dialog.CreateControllerDialog
 import wld.accelerate.quickcrud.dialog.CreateEntitiyDialog
@@ -43,7 +44,7 @@ fun generatingClassesMouseTreeListener(generateTree: Tree, toolWindow: ToolWindo
                                 val yamlMap = parseYaml(file.absolutePath)
                                 val packagePathString = yamlMap["packagePath"] as String
                                 val entitiesMap = yamlMap["entities"] as Map<String, Map<String, Any>>
-                                val enumsMap = yamlMap["enums"] as LinkedHashMap<String, String>
+                                val enumsMap = yamlMap["enums"] as LinkedHashMap<String, List<String>>
                                 val generatingFunction =
                                     { generateSuffix: String, entityClassRepresentations: Map<String, String>, fileEnding: String ->
                                         val generatePath = toolWindow.project.basePath + generateSuffix
@@ -310,8 +311,8 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
 
                         val createConfigFileIfNotExists = {
                             if (!Files.exists(Path.of(configFile.absolutePath))) {
-                                val file =
-                                    File("${toolWindow.project.basePath}/src/main/resources/config.yaml").createNewFile()
+                                Files.createDirectories(Path.of(toolWindow.project.basePath + "/src/main/resources/"))
+                                File("${toolWindow.project.basePath}/src/main/resources/config.yaml").createNewFile()
                             }
                         }
 
@@ -393,16 +394,20 @@ fun createConfigMouseTreeListener(generateTree: Tree, toolWindow: ToolWindow): M
                                 Messages.showInfoMessage(fields[enumName]!!.joinToString(), "join")
 
                                 createConfigFileIfNotExists()
-                                val yamlMap = parseYaml(configFile.absolutePath)
+                                try{
+                                    val yamlMap = parseYaml(configFile.absolutePath)
 
-                                configFile.writeText(
-                                    getConfigFileString(
-                                        mapOf<String, Any>(),
-                                        mapOf<String, Any>(),
-                                        fields,
-                                        yamlMap as Map<*, *>
+                                    configFile.writeText(
+                                        getConfigFileString(
+                                            mapOf<String, Any>(),
+                                            mapOf<String, Any>(),
+                                            fields,
+                                            yamlMap as Map<*, *>
+                                        )
                                     )
-                                )
+                                } catch (yamlReadException: YAMLException) {
+                                    Messages.showErrorDialog("The file could not be parsed", "Invalid Yaml Syntax")
+                                }
                             }
                         }
                     }

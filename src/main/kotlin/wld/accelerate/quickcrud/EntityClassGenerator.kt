@@ -5,17 +5,14 @@ import wld.accelerate.quickcrud.extension.snakeCase
 import wld.accelerate.quickcrud.extension.unCapitalize
 import java.util.regex.Pattern
 
-fun writeJavaEnums(enums: Map<String, String>, packagePath: String): Map<String, String> {
+fun writeJavaEnums(enums: Map<String, List<String>>, packagePath: String): Map<String, String> {
     val head: (String) -> String = { "package $packagePath;\n\npublic enum ${String.capitalize(it)} {" }
     val entry: (String) -> String = { "\n\t$it," }
     val foot: String = "\n}"
 
-    val enumsFileMap = enums.entries.associate {
-        it.key to
-                head(it.key) + (it.value.filterNot { it == '[' || it == ']' || it == ' ' }
-                    .split(",")
-                    .map { entry(it) }
-            .joinToString(separator = "")) + foot
+    val enumsFileMap = enums.entries.associate { entry ->
+        entry.key to
+                head(entry.key) + (entry.value.joinToString(separator = "") { entry(it) }) + foot
     }
 
     return enumsFileMap

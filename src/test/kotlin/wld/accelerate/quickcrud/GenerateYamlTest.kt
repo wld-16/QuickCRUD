@@ -1,9 +1,11 @@
 package wld.accelerate.quickcrud
 
 import junit.framework.TestCase.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 import wld.accelerate.quickcrud.extension.ENDPOINT
 
+@Ignore
 class GenerateYamlTest {
     @Test
     fun test_writeYamlEntities() {

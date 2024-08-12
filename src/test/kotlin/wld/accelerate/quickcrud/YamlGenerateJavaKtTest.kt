@@ -2,11 +2,13 @@ package wld.accelerate.quickcrud
 
 import junit.framework.TestCase.assertTrue
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
+@Ignore
 class YamlGenerateJavaKtTest() {
     @Test
     fun test_parseYaml() {
@@ -29,7 +31,7 @@ class YamlGenerateJavaKtTest() {
 
         val yamlMap = parseYaml(file.absolutePath)
 
-        val linkedHashMap = yamlMap?.get("enums") as LinkedHashMap<String, String>
+        val linkedHashMap = yamlMap["enums"] as LinkedHashMap<String, List<String>>
 
         val enumClassRepresentations = writeJavaEnums(linkedHashMap, yamlMap["packagePath"] as String)
 

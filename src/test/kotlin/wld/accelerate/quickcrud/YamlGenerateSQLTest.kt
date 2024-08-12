@@ -74,7 +74,7 @@ class YamlGenerateSQLTest {
         val classLoader = javaClass.classLoader
         val file = File(classLoader.getResource(resourceName)!!.file)
         val yamlMap = parseYaml(file.absolutePath)
-        val entities = yamlMap?.get("entities") as Map<String, Map<String, Any>>
+        val entities = yamlMap["entities"] as Map<String, Map<String, Any>>
         File("src/test/kotlin/wld/accelerate/quickcrud/sh/executeSQL.sh").writeText(writeShellScript(entities))
     }
 

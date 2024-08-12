@@ -219,7 +219,7 @@ fun writeVueCreateForm(entities: Map<String, Map<String, Any>>): Map<String, Str
                 "   onMounted(() => {\n" +
                 selectEntities.entries.joinToString (separator = ""){
                     if(it.value.toString().contains("List")) {
-                        "    getData(\"http://localhost:8080/${it.key.dropLast(1)}/\").then(response => {\n"
+                        "    getData(\"http://localhost:8080/${it.key.dropLast(4)}/\").then(response => {\n"
                     } else {
                         "    getData(\"http://localhost:8080/${it.key}/\").then(response => {\n"
                     } +
